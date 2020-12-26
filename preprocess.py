@@ -1,3 +1,6 @@
+"""
+"""
+
 import os
 import glob
 import xml.etree.ElementTree as ElementTree
@@ -48,19 +51,20 @@ def get_midpoints(pts):
     params : ndarray (nested) of points
     Returns: list of mid points for x and y
     """
-    xmax, ymax = max(pts, key=lambda x: x[0])[0], max(pts, key=lambda x: x[1])[1]
-    xmin, ymin = min(pts, key=lambda x: x[0])[0], min(pts, key=lambda x: x[1])[1]
+    xmax = max(pts, key=lambda p: p[0])[0]
+    ymax = max(pts, key=lambda p: p[1])[1]
+    xmin,  = min(pts, key=lambda p: p[0])[0]
+    ymin = min(pts, key=lambda p: p[1])[1]
     return [(xmax + xmin)/2., (ymax + ymin)/2.]
 
 
-def save_data(dataset, label, trans_dict):
-    try:
-        os.makedirs('data')
-    except FileExistsError:
-        pass
-    np.save(os.path.join('data', 'dataset'), np.array(dataset))
-    np.save(os.path.join('data', 'labels'), np.array(label))
-    with open(os.path.join('data', 'translation.pkl'), 'wb') as file:
+def save_data(dataset, label, trans_dict, path='data'):
+    if not os.path.isdir('data'):
+        os.mkdir('data')
+
+    np.save(os.path.join(path, 'dataset'), np.array(dataset))
+    np.save(os.path.join(path, 'labels'), np.array(label))
+    with open(os.path.join(path, 'translation.pkl'), 'wb') as file:
         pickle.dump(trans_dict, file)
 
 
@@ -79,8 +83,10 @@ def main():
         if not transcription:
             print('skipped')
             continue
-        texts = [html.unescape(tl.get('text')) for tl in transcription[0].findall('TextLine')]
-        points = [strk.findall('Point') for strk in xml.findall('StrokeSet/Stroke')]
+        texts = [html.unescape(tl.get('text')) for
+                 tl in transcription[0].findall('TextLine')]
+        points = [strk.findall('Point') for
+                  strk in xml.findall('StrokeSet/Stroke')]
         strokes = []
         mid_points = []
 
@@ -108,7 +114,8 @@ def main():
         print('lines = {:4d}; texts = {:4d}'.format(len(lines), len(texts)))
         charset |= set(''.join(texts))
         data += [(texts, lines)]
-    print('data = {}; charset = ({}) {}'.format(len(data), len(charset), ''.join(sorted(charset))))
+    print('data = {}; charset = ({}) {}'.format(len(data), len(charset),
+          ''.join(sorted(charset))))
 
     translation = {'<NULL>': 0}
     for c in ''.join(sorted(charset)):
