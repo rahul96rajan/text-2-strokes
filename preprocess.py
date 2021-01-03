@@ -53,7 +53,7 @@ def get_midpoints(pts):
     """
     xmax = max(pts, key=lambda p: p[0])[0]
     ymax = max(pts, key=lambda p: p[1])[1]
-    xmin,  = min(pts, key=lambda p: p[0])[0]
+    xmin = min(pts, key=lambda p: p[0])[0]
     ymin = min(pts, key=lambda p: p[1])[1]
     return [(xmax + xmin)/2., (ymax + ymin)/2.]
 
