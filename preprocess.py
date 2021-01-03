@@ -69,6 +69,24 @@ def save_data(dataset, label, trans_dict, path='data'):
 
 
 def main():
+    """
+    Processing the xmls files and returning datasets and labels.
+    Where data set is
+    Preprocessing applied:
+        - Check for any undesired dot or line and removing it.
+        - Seperating sequences of points based on the end of stroke.
+        - Determinig new line via distances between end of stoke and beginning
+          of the other.
+        - storing `data` as tuple of individual linetext from xml and the
+          respective array of points.
+        - keeping note of all characters encountered under `charset`.
+        - forming a dict `translation` which maps chars to index. (encoding)
+        - returns:
+            - dataset (list): list of array of points. where each array
+                              corresponds to respective textline.
+            - label (list): list of array of int-encoded textlines.
+            - translation (dict): dict mapping characters to integer value.
+    """
     data = []
     charset = set()
 
