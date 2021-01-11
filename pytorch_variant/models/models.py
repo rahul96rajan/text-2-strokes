@@ -34,9 +34,8 @@ def sample_from_out_dist(y_hat, bias):
         correlations[K] * std_1[K] * std_2[K],
     )
 
-    x = torch.normal(mean=torch.Tensor([0.0, 0.0]), std=torch.Tensor([1.0, 1.0])).to(
-        y_hat.device
-    )
+    x = torch.normal(mean=torch.Tensor([0.0, 0.0]),
+                     std=torch.Tensor([1.0, 1.0])).to(y_hat.device)
     Z = mu_k + torch.mv(cov, x)
 
     sample = y_hat.new_zeros(1, 1, 3)
@@ -92,7 +91,8 @@ def sample_batch_from_out_dist(y_hat, bias):
 
 class HandWritingPredictionNet(nn.Module):
 
-    def __init__(self, hidden_size=400, n_layers=3, output_size=121, input_size=3):
+    def __init__(self, hidden_size=400, n_layers=3, output_size=121,
+                 input_size=3):
         super(HandWritingPredictionNet, self).__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
@@ -100,10 +100,12 @@ class HandWritingPredictionNet(nn.Module):
         self.n_layers = n_layers
 
         self.LSTM_layers = nn.ModuleList()
-        self.LSTM_layers.append(nn.LSTM(input_size, hidden_size, 1, batch_first=True))
+        self.LSTM_layers.append(
+            nn.LSTM(input_size, hidden_size, 1, batch_first=True))
         for i in range(n_layers - 1):
             self.LSTM_layers.append(
-                nn.LSTM(input_size + hidden_size, hidden_size, 1, batch_first=True)
+                nn.LSTM(input_size + hidden_size,
+                        hidden_size, 1, batch_first=True)
             )
 
         self.output_layer = nn.Linear(n_layers * hidden_size, output_size)
@@ -132,8 +134,10 @@ class HandWritingPredictionNet(nn.Module):
 
     def init_hidden(self, batch_size, device):
         initial_hidden = (
-            torch.zeros(self.n_layers, batch_size, self.hidden_size, device=device),
-            torch.zeros(self.n_layers, batch_size, self.hidden_size, device=device),
+            torch.zeros(self.n_layers, batch_size,
+                        self.hidden_size, device=device),
+            torch.zeros(self.n_layers, batch_size,
+                        self.hidden_size, device=device),
         )
         return initial_hidden
 
@@ -187,7 +191,8 @@ class HandWritingPredictionNet(nn.Module):
 
 class HandWritingSynthesisNet(nn.Module):
 
-    def __init__(self, hidden_size=400, n_layers=3, output_size=121, window_size=77):
+    def __init__(self, hidden_size=400, n_layers=3, output_size=121,
+                 window_size=77):
         super(HandWritingSynthesisNet, self).__init__()
         self.vocab_size = window_size
         self.hidden_size = hidden_size
@@ -197,7 +202,8 @@ class HandWritingSynthesisNet(nn.Module):
         self.EOS = False
         self._phi = []
 
-        self.lstm_1 = nn.LSTM(3 + self.vocab_size, hidden_size, batch_first=True)
+        self.lstm_1 = nn.LSTM(3 + self.vocab_size,
+                              hidden_size, batch_first=True)
         self.lstm_2 = nn.LSTM(
             3 + self.vocab_size + hidden_size, hidden_size, batch_first=True
         )
@@ -214,10 +220,13 @@ class HandWritingSynthesisNet(nn.Module):
 
     def init_hidden(self, batch_size, device):
         initial_hidden = (
-            torch.zeros(self.n_layers, batch_size, self.hidden_size, device=device),
-            torch.zeros(self.n_layers, batch_size, self.hidden_size, device=device),
+            torch.zeros(self.n_layers, batch_size,
+                        self.hidden_size, device=device),
+            torch.zeros(self.n_layers, batch_size,
+                        self.hidden_size, device=device),
         )
-        window_vector = torch.zeros(batch_size, 1, self.vocab_size, device=device)
+        window_vector = torch.zeros(
+            batch_size, 1, self.vocab_size, device=device)
         kappa = torch.zeros(batch_size, 10, 1, device=device)
         return initial_hidden, window_vector, kappa
 
@@ -229,7 +238,8 @@ class HandWritingSynthesisNet(nn.Module):
             encoding[i, torch.arange(U), text[i].long()] = 1.0
         return encoding
 
-    def compute_window_vector(self, mix_params, prev_kappa, text, text_mask, is_map):
+    def compute_window_vector(self, mix_params, prev_kappa, text, text_mask,
+                              is_map):
         encoding = self.one_hot_encoding(text)
         mix_params = torch.exp(mix_params)
 
@@ -238,7 +248,8 @@ class HandWritingSynthesisNet(nn.Module):
         kappa = kappa + prev_kappa
         prev_kappa = kappa
 
-        u = torch.arange(text.shape[1], dtype=torch.float32, device=text.device)
+        u = torch.arange(
+            text.shape[1], dtype=torch.float32, device=text.device)
 
         phi = torch.sum(alpha * torch.exp(-beta * (kappa - u).pow(2)), dim=1)
         if phi[0, -1] > torch.max(phi[0, :-1]):
@@ -267,16 +278,8 @@ class HandWritingSynthesisNet(nn.Module):
         nn.init.uniform_(self.output_layer.weight, a=-0.1, b=0.1)
         nn.init.constant_(self.output_layer.bias, 0.0)
 
-    def forward(
-        self,
-        inputs,
-        text,
-        text_mask,
-        initial_hidden,
-        prev_window_vec,
-        prev_kappa,
-        is_map=False,
-    ):
+    def forward(self, inputs, text, text_mask, initial_hidden, prev_window_vec,
+                prev_kappa, is_map=False):
 
         hid_1 = []
         window_vec = []
@@ -320,20 +323,8 @@ class HandWritingSynthesisNet(nn.Module):
 
         return y_hat, [state_1, state_2, state_3], window_vec, prev_kappa
 
-    def generate(
-        self,
-        inp,
-        text,
-        text_mask,
-        prime_text,
-        prime_mask,
-        hidden,
-        window_vector,
-        kappa,
-        bias,
-        is_map=False,
-        prime=False,
-    ):
+    def generate(self, inp, text, text_mask, prime_text, prime_mask, hidden,
+                 window_vector, kappa, bias, is_map=False, prime=False):
         seq_len = 0
         gen_seq = []
         with torch.no_grad():
@@ -341,7 +332,8 @@ class HandWritingSynthesisNet(nn.Module):
             print("batch_size:", batch_size)
             if prime:
                 y_hat, state, window_vector, kappa = self.forward(
-                    inp, prime_text, prime_mask, hidden, window_vector, kappa, is_map
+                    inp, prime_text, prime_mask, hidden, window_vector, kappa,
+                    is_map
                 )
 
                 _hidden = torch.cat([s[0] for s in state], dim=0)
@@ -358,7 +350,8 @@ class HandWritingSynthesisNet(nn.Module):
                 # gen_seq.append(Z)
                 self.EOS = False
                 inp = inp.new_zeros(batch_size, 1, 3)
-                _, window_vector, kappa = self.init_hidden(batch_size, inp.device)
+                _, window_vector, kappa = self.init_hidden(
+                    batch_size, inp.device)
 
             while not self.EOS and seq_len < 2000:
                 y_hat, state, window_vector, kappa = self.forward(

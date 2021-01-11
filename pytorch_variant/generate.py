@@ -1,9 +1,9 @@
 import torch
 import numpy as np
 import argparse
-import matplotlib
+# import matplotlib
 from pathlib import Path
-import os
+# import os
 import matplotlib.pyplot as plt
 from utils import plot_stroke
 from utils.constants import Global
@@ -14,7 +14,8 @@ from models.models import HandWritingPredictionNet, HandWritingSynthesisNet
 
 def argparser():
 
-    parser = argparse.ArgumentParser(description="PyTorch Handwriting Synthesis Model")
+    parser = argparse.ArgumentParser(
+        description="PyTorch Handwriting Synthesis Model")
     parser.add_argument("--model", type=str, default="synthesis")
     parser.add_argument(
         "--model_path",
@@ -25,7 +26,8 @@ def argparser():
     parser.add_argument("--seq_len", type=int, default=400)
     parser.add_argument("--batch_size", type=int, default=1)
     parser.add_argument("--bias", type=float, default=10.0, help="bias")
-    parser.add_argument("--char_seq", type=str, default="This is real handwriting")
+    parser.add_argument("--char_seq", type=str,
+                        default="This is real handwriting")
     parser.add_argument("--text_req", action="store_true")
     parser.add_argument("--prime", action="store_true")
     parser.add_argument("--is_map", action="store_true")
@@ -37,7 +39,8 @@ def argparser():
     return args
 
 
-def generate_unconditional_seq(model_path, seq_len, device, bias, style, prime):
+def generate_unconditional_seq(model_path, seq_len, device, bias, style,
+                               prime):
 
     model = HandWritingPredictionNet()
     # load the best model
@@ -59,19 +62,10 @@ def generate_unconditional_seq(model_path, seq_len, device, bias, style, prime):
     return gen_seq
 
 
-def generate_conditional_sequence(
-    model_path,
-    char_seq,
-    device,
-    char_to_id,
-    idx_to_char,
-    bias,
-    prime,
-    prime_seq,
-    real_text,
-    is_map,
-    batch_size=1,
-):
+def generate_conditional_sequence(model_path, char_seq, device, char_to_id,
+                                  idx_to_char, bias, prime, prime_seq,
+                                  real_text, is_map, batch_size=1):
+
     model = HandWritingSynthesisNet(window_size=len(char_to_id))
     print("Vocab size: ", len(char_to_id))
     # load the best model
@@ -90,7 +84,8 @@ def generate_conditional_sequence(
         inp = prime_seq
         real_seq = np.array(list(real_text))
         idx_arr = [char_to_id[char] for char in real_seq]
-        prime_text = np.array([idx_arr for i in range(batch_size)]).astype(np.float32)
+        prime_text = np.array(
+            [idx_arr for i in range(batch_size)]).astype(np.float32)
         prime_text = torch.from_numpy(prime_text).to(device)
         prime_mask = torch.ones(prime_text.shape).to(device)
     else:
@@ -110,22 +105,13 @@ def generate_conditional_sequence(
     hidden, window_vector, kappa = model.init_hidden(batch_size, device)
 
     print("Generating sequence....")
-    gen_seq = model.generate(
-        inp,
-        text,
-        text_mask,
-        prime_text,
-        prime_mask,
-        hidden,
-        window_vector,
-        kappa,
-        bias,
-        is_map,
-        prime=prime,
-    )
+    gen_seq = model.generate(inp, text, text_mask, prime_text, prime_mask,
+                             hidden, window_vector, kappa, bias, is_map,
+                             prime=prime)
 
     length = len(text_mask.nonzero())
-    print("Input seq: ", "".join(idx_to_char(text[0].detach().cpu().numpy()))[:length])
+    print("Input seq: ", "".join(idx_to_char(
+        text[0].detach().cpu().numpy()))[:length])
     print("Length of input sequence: ", text[0].shape[0])
 
     if is_map:
@@ -182,7 +168,8 @@ if __name__ == "__main__":
         real_text = texts[idx]
         style = strokes[idx]
         # plot the sequence
-        plot_stroke(style, save_name=args.save_path / ("style_" + str(idx) + ".png"))
+        plot_stroke(style, save_name=args.save_path /
+                    ("style_" + str(idx) + ".png"))
         print(real_text)
         mean, std, _ = data_normalization(style)
         style = np.array([style for i in range(args.batch_size)])
@@ -196,28 +183,24 @@ if __name__ == "__main__":
         ytext = args.char_seq + "  "
 
     if model == "prediction":
-        gen_seq = generate_unconditional_seq(
-            model_path, args.seq_len, device, args.bias, style=style, prime=args.prime
-        )
+        gen_seq = generate_unconditional_seq(model_path, args.seq_len, device,
+                                             args.bias, style=style,
+                                             prime=args.prime)
     elif model == "synthesis":
-        gen_seq, phi = generate_conditional_sequence(
-            model_path,
-            args.char_seq,
-            device,
-            train_dataset.char_to_id,
-            train_dataset.idx_to_char,
-            args.bias,
-            args.prime,
-            style,
-            real_text,
-            args.is_map,
-            args.batch_size,
-        )
+        gen_seq, phi = generate_conditional_sequence(model_path, args.char_seq,
+                                                     device,
+                                                     train_dataset.char_to_id,
+                                                     train_dataset.idx_to_char,
+                                                     args.bias, args.prime,
+                                                     style, real_text,
+                                                     args.is_map,
+                                                     args.batch_size)
         if args.is_map:
             plt.imshow(phi, cmap="viridis", aspect="auto")
             plt.colorbar()
             plt.xlabel("time steps")
-            plt.yticks(np.arange(phi.shape[0]), list(ytext), rotation="horizontal")
+            plt.yticks(np.arange(phi.shape[0]), list(
+                ytext), rotation="horizontal")
             plt.margins(0.2)
             plt.subplots_adjust(bottom=0.15)
             plt.savefig("heat_map.png")
@@ -228,10 +211,12 @@ if __name__ == "__main__":
     #     print("data denormalization...")
     #     gen_seq = data_denormalization(mean, std, gen_seq)
     # else:
-    gen_seq = data_denormalization(Global.train_mean, Global.train_std, gen_seq)
+    gen_seq = data_denormalization(
+        Global.train_mean, Global.train_std, gen_seq)
 
     # plot the sequence
     for i in range(args.batch_size):
         plot_stroke(
-            gen_seq[i], save_name=args.save_path / ("gen_seq_" + str(i) + ".png")
+            gen_seq[i], save_name=args.save_path /
+            ("gen_seq_" + str(i) + ".png")
         )
