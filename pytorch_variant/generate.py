@@ -19,7 +19,7 @@ def argparser():
     parser.add_argument(
         "--model_path",
         type=Path,
-        default="./results/synthesis/best_model_synthesis_3.pt",
+        default="./results/synthesis/best_model_synthesis_4.pt",
     )
     parser.add_argument("--save_path", type=Path, default="./results/")
     parser.add_argument("--seq_len", type=int, default=400)
