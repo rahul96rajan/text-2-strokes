@@ -18,7 +18,7 @@ from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DataLoader
 # from torch.distributions import bernoulli, uniform
 # import torch.nn.functional as F
-
+import time
 import matplotlib
 
 matplotlib.use("Agg")
@@ -171,6 +171,7 @@ def train(model, train_loader, valid_loader, batch_size, n_epochs, lr,
     best_epoch = 0
     k = 0
     for epoch in range(n_epochs):
+        start_time = time.time()
         print("[INFO] Training Model.....")
         train_loss = train_epoch(model, optimizer, epoch, train_loader,
                                  device, model_type)
@@ -242,6 +243,7 @@ def train(model, train_loader, valid_loader, batch_size, n_epochs, lr,
             break
         else:
             k += 1
+        print('Time taken per epoch: {:.2f}s\n'.format(time.time() - start_time))
 
 
 if __name__ == "__main__":
