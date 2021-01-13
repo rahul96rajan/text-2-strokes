@@ -1,15 +1,17 @@
 import torch
 import numpy as np
 from collections import Counter
-from torch.utils.data import DataLoader, Dataset
-from utils.data_utils import train_offset_normalization, valid_offset_normalization
+from torch.utils.data import Dataset  # DataLoader,
+from utils.data_utils import train_offset_normalization,\
+                             valid_offset_normalization
 from utils.constants import Global
 
 
 class HandwritingDataset(Dataset):
     """Handwriting dataset."""
 
-    def __init__(self, data_path, split='train', text_req=False, debug=False, max_seq_len=300, data_aug=False):
+    def __init__(self, data_path, split='train', text_req=False, debug=False,
+                 max_seq_len=300, data_aug=False):
         """
         Args:
             data_path (string): Path to the data folder.
@@ -19,7 +21,8 @@ class HandwritingDataset(Dataset):
         self.max_seq_len = max_seq_len
         self.data_aug = data_aug
 
-        strokes = np.load(data_path + 'strokes.npy', allow_pickle=True, encoding='bytes')
+        strokes = np.load(data_path + 'strokes.npy', allow_pickle=True,
+                          encoding='bytes')
         with open(data_path + 'sentences.txt') as file:
             texts = file.read().splitlines()
 
@@ -28,7 +31,10 @@ class HandwritingDataset(Dataset):
         max_len = np.max(lengths)
         n_total = len(strokes)
 
-        # Mask
+        # Mask - Padding (strokes data)
+        """
+        #TODO Rename mask to mask_sequence to reduce confusion.
+        """
         mask_shape = (n_total, max_len)
         mask = np.zeros(mask_shape, dtype=np.float32)
 
@@ -47,7 +53,10 @@ class HandwritingDataset(Dataset):
         inp_text = np.ndarray((n_total, max_char_len), dtype='<U1')
         inp_text[:, :] = ' '
 
-        # Convert list of stroke(array) into ndarray of size(n_total, max_len, 3)
+        # Convert list of stroke(array) into ndarray of size(n_total,max_len,3)
+        """
+        #TODO Rename data to stroke_data to reduce confusion.
+        """
         data_shape = (n_total, max_len, 3)
         data = np.zeros(data_shape, dtype=np.float32)
 
@@ -67,6 +76,7 @@ class HandwritingDataset(Dataset):
         inp_text = inp_text[idx_permute]
         char_mask = char_mask[idx_permute]
 
+        """OBSOLETE"""
         if debug:
             data = data[:64]
             mask = mask[:64]
@@ -80,8 +90,8 @@ class HandwritingDataset(Dataset):
             self.mask = mask[:n_train]
             self.texts = inp_text[:n_train]
             self.char_mask = char_mask[:n_train]
-            Global.train_mean, Global.train_std, self.dataset = train_offset_normalization(
-                self.dataset)
+            Global.train_mean, Global.train_std, self.dataset = \
+                train_offset_normalization(self.dataset)
 
         elif split == 'valid':
             self.dataset = data[n_train:]
@@ -98,7 +108,8 @@ class HandwritingDataset(Dataset):
         return np.array([self.id_to_char[id] for id in id_seq])
 
     def char_to_idx(self, char_seq):
-        return np.array([self.char_to_id[char] for char in char_seq]).astype(np.float32)
+        return np.array([self.char_to_id[char]
+                         for char in char_seq]).astype(np.float32)
 
     def build_vocab(self, texts):
         counter = Counter()
@@ -106,17 +117,23 @@ class HandwritingDataset(Dataset):
             counter.update(text)
         unique_char = sorted(counter)
         vocab_size = len(unique_char)
-
+        """
+        TODO : Replace with
         id_to_char = dict(zip(np.arange(vocab_size), unique_char))
         char_to_id = dict([(v, k) for (k, v) in id_to_char.items()])
         return id_to_char, char_to_id
+        """
+        id_to_char_dic = {k: v for k, v in zip(range(vocab_size), unique_char)}
+        char_to_id_dic = {v: k for k, v in id_to_char_dic.items()}
+        return id_to_char_dic, char_to_id_dic
 
     def __getitem__(self, idx):
 
         mask = torch.from_numpy(self.mask[idx])
 
         if self.text_req:
-            input_seq = torch.zeros(self.dataset[idx].shape, dtype=torch.float32)
+            input_seq = torch.zeros(self.dataset[idx].shape,
+                                    dtype=torch.float32)
             input_seq[1:, :] = torch.from_numpy(self.dataset[idx, :-1, :])
 
             target = torch.from_numpy(self.dataset[idx])
@@ -124,7 +141,8 @@ class HandwritingDataset(Dataset):
             char_mask = torch.from_numpy(self.char_mask[idx])
             return (input_seq, target, mask, text, char_mask)
         elif self.data_aug:
-            seq_len = len(mask.nonzero())
+            # seq_len = len(mask.nonzero())
+            seq_len = len(torch.nonzero(mask, as_tuple=False).to(mask.device))
             start = 0
             end = self.max_seq_len
 
@@ -142,7 +160,8 @@ class HandwritingDataset(Dataset):
 
             return (input_seq, target, mask)
         else:
-            input_seq = torch.zeros(self.dataset[idx].shape, dtype=torch.float32)
+            input_seq = torch.zeros(self.dataset[idx].shape,
+                                    dtype=torch.float32)
             input_seq[1:, :] = torch.from_numpy(self.dataset[idx, :-1, :])
             target = torch.from_numpy(self.dataset[idx])
             return (input_seq, target, mask)

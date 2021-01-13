@@ -17,7 +17,8 @@ def train_offset_normalization(data):
 
 def valid_offset_normalization(mean, std, data):
     """
-       Data normalization using train set mean and std
+       The co-ordinate offsets are normalised to
+       mean 0, std. dev. 1 over the validation set.
     """
     data[:, :, 1:] -= mean
     data[:, :, 1:] /= std
@@ -36,7 +37,7 @@ def data_denormalization(mean, std, data):
 
 def data_normalization(data):
     """
-       Data denormalization using train set mean and std
+       Data normalization using train set mean and std
     """
     mean = data[:, 1:].mean(axis=0)
     data[:, 1:] -= mean
@@ -48,7 +49,7 @@ def data_normalization(data):
 
 def data_processing(data):
     """
-       Data denormalization using train set mean and std
+       OBSOLETE
     """
     min_xy = data[:, 1:].min(axis=0)
     data[:, 1:] -= min_xy

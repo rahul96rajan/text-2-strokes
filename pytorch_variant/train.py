@@ -98,7 +98,7 @@ def train_epoch(model, optimizer, epoch, train_loader, device, model_type):
         # print every 10 mini-batches
         if i % 10 == 0:
             print(
-                "[{:d}, {:5d}] loss: {:.3f}".format(
+                "[Epoch: {:d}, MB: {:5d}] loss: {:.3f}".format(
                     epoch + 1, i + 1, loss / batch_size)
             )
     avg_loss /= len(train_loader.dataset)
@@ -143,7 +143,7 @@ def validation(model, valid_loader, device, epoch, model_type):
             # print every 10 mini-batches
             if i % 10 == 0:
                 print(
-                    "[{:d}, {:5d}] loss: {:.3f}".format(
+                    "[Epoch: {:d}, MB: {:5d}] loss: {:.3f}".format(
                         epoch + 1, i + 1, loss / batch_size
                     )
                 )
@@ -157,7 +157,11 @@ def train(model, train_loader, valid_loader, batch_size, n_epochs, lr,
           patience, step_size, device, model_type, save_path):
     model_path = save_path + "best_model_" + model_type + ".pt"
     model = model.to(device)
-
+    """
+    #TODO
+    model.load_state_dict(torch.load(model_path))
+    print(f"[INFO] Loaded model weights from '{model_path}'")
+    """
     optimizer = optim.Adam(model.parameters(), lr=lr)
     scheduler = StepLR(optimizer, step_size=step_size, gamma=0.1)
 
@@ -167,18 +171,23 @@ def train(model, train_loader, valid_loader, batch_size, n_epochs, lr,
     best_epoch = 0
     k = 0
     for epoch in range(n_epochs):
-        print("training.....")
+        print("[INFO] Training Model.....")
         train_loss = train_epoch(model, optimizer, epoch, train_loader,
                                  device, model_type)
 
-        print("validation....")
+        print("[INFO] Validating Model....")
         valid_loss = validation(model, valid_loader, device, epoch, model_type)
 
         train_losses.append(train_loss)
         valid_losses.append(valid_loss)
 
+        """
         print(f"Epoch {epoch + 1}: Train: avg. loss: {train_loss:.3f}")
         print(f"Epoch {epoch + 1}: Valid: avg. loss: {valid_loss:.3f}")
+        """
+
+        print(f"Epoch {epoch + 1}/{n_epochs}\tTrain loss: {train_loss:.3f}\t"
+              f"Val loss: {valid_loss:.3f}")
 
         if step_size != -1:
             scheduler.step()
@@ -186,7 +195,7 @@ def train(model, train_loader, valid_loader, batch_size, n_epochs, lr,
         if valid_loss < best_loss:
             best_loss = valid_loss
             best_epoch = epoch + 1
-            print("Saving best model at epoch {}".format(epoch + 1))
+            print("[SAVE] Saving best model at epoch {}".format(epoch + 1))
             torch.save(model.state_dict(), model_path)
             if model_type == "prediction":
                 gen_seq = generate_unconditional_seq(model_path, 700, device,
@@ -248,19 +257,22 @@ if __name__ == "__main__":
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+    """
     print("Arguments: {}".format(args))
+    """
+    print('--ARGUMENTS--')
+    for arg in vars(args):
+        print(f"{arg} = {getattr(args, arg)}")
     model_type = args.model_type
     batch_size = args.batch_size
     n_epochs = args.n_epochs
 
     # Load the data and text
-    train_dataset = HandwritingDataset(
-        args.data_path,
-        split="train",
-        text_req=args.text_req,
-        debug=args.debug,
-        data_aug=args.data_aug,
-    )
+    train_dataset = HandwritingDataset(args.data_path, split="train",
+                                       text_req=args.text_req,
+                                       debug=args.debug,
+                                       data_aug=args.data_aug,)
+
     valid_dataset = HandwritingDataset(args.data_path, split="valid",
                                        text_req=args.text_req,
                                        debug=args.debug,

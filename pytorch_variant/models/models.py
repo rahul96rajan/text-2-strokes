@@ -8,7 +8,10 @@ from utils.model_utils import stable_softmax
 def sample_from_out_dist(y_hat, bias):
     split_sizes = [1] + [20] * 6
     y = torch.split(y_hat, split_sizes, dim=0)
-
+    """
+    Can softmax be replaced
+    Equation 16 to  25
+    """
     eos_prob = torch.sigmoid(y[0])
     mixture_weights = stable_softmax(y[1] * (1 + bias), dim=0)
     mu_1 = y[2]
@@ -45,6 +48,9 @@ def sample_from_out_dist(y_hat, bias):
 
 
 def sample_batch_from_out_dist(y_hat, bias):
+    """
+    Can be removed
+    """
     batch_size = y_hat.shape[0]
     split_sizes = [1] + [20] * 6
     y = torch.split(y_hat, split_sizes, dim=1)
@@ -93,12 +99,20 @@ class HandWritingPredictionNet(nn.Module):
 
     def __init__(self, hidden_size=400, n_layers=3, output_size=121,
                  input_size=3):
+        """
+        RENAME: `hidden_size` to `hidden_units_size`
+        """
         super(HandWritingPredictionNet, self).__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.output_size = output_size
         self.n_layers = n_layers
-
+        """
+        self.LSTM_layers = nn.ModuleList([
+            nn.LSTM(input_size, hidden_size, 1, batch_first=True)
+        ])
+        Also try with LSTMS own hidden layer number
+        """
         self.LSTM_layers = nn.ModuleList()
         self.LSTM_layers.append(
             nn.LSTM(input_size, hidden_size, 1, batch_first=True))
@@ -130,7 +144,7 @@ class HandWritingPredictionNet(nn.Module):
         inp = torch.cat(hiddens, dim=2)
         y_hat = self.output_layer(inp)
 
-        return y_hat, hidden_cell_state
+        return y_hat, hidden_cell_state     # hidden_cell_state(tuple of (h,c))
 
     def init_hidden(self, batch_size, device):
         initial_hidden = (
@@ -170,7 +184,11 @@ class HandWritingPredictionNet(nn.Module):
                 gen_seq.append(Z)
 
             for i in range(seq_len):
-
+                """
+                RENAME for clarity
+                state to hidden_cell_state,
+                and hidden to init_hid_cell_state
+                """
                 y_hat, state = self.forward(inp, hidden)
 
                 _hidden = torch.cat([s[0] for s in state], dim=0)
@@ -198,9 +216,9 @@ class HandWritingSynthesisNet(nn.Module):
         self.hidden_size = hidden_size
         self.output_size = output_size
         self.n_layers = n_layers
-        K = 10
+        K = 10                      # Number of Gaussian Functions
         self.EOS = False
-        self._phi = []
+        self._phi = []              # Equation 46
 
         self.lstm_1 = nn.LSTM(3 + self.vocab_size,
                               hidden_size, batch_first=True)
@@ -214,7 +232,7 @@ class HandWritingSynthesisNet(nn.Module):
             3 + self.vocab_size + hidden_size, hidden_size, batch_first=True
         )
 
-        self.window_layer = nn.Linear(hidden_size, 3 * K)
+        self.window_layer = nn.Linear(hidden_size, 3 * K)  # Equation 48-51
         self.output_layer = nn.Linear(n_layers * hidden_size, output_size)
         # self.init_weight()
 
@@ -231,6 +249,9 @@ class HandWritingSynthesisNet(nn.Module):
         return initial_hidden, window_vector, kappa
 
     def one_hot_encoding(self, text):
+        """
+        Expects label encoded text
+        """
         N = text.shape[0]
         U = text.shape[1]
         encoding = text.new_zeros((N, U, self.vocab_size))
@@ -291,7 +312,7 @@ class HandWritingSynthesisNet(nn.Module):
 
             hid_1_t, state_1 = self.lstm_1(inp, state_1)
             hid_1.append(hid_1_t)
-
+            # Equation 48-49
             mix_params = self.window_layer(hid_1_t)
             window, kappa = self.compute_window_vector(
                 mix_params.squeeze(dim=1).unsqueeze(2),
