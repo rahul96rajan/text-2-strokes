@@ -2,8 +2,8 @@ import torch
 import numpy as np
 import argparse
 # import os
-import matplotlib
-import matplotlib.pyplot as plt
+# import matplotlib
+# import matplotlib.pyplot as plt
 from pathlib import Path
 from utils import plot_stroke
 from utils.constants import Global
@@ -20,7 +20,7 @@ def argparser():
     parser.add_argument(
         "--model_path",
         type=Path,
-        default="./pretrained/model_synthesis.pt",
+        default="./pretrained/model_synthesis.pt"
     )
     parser.add_argument("--save_path", type=Path, default="./results/")
     parser.add_argument("--seq_len", type=int, default=400)
@@ -29,12 +29,12 @@ def argparser():
     parser.add_argument("--char_seq", type=str,
                         default="A sample of generated handwriting")
     parser.add_argument("--text_req", action="store_true")
-    parser.add_argument("--prime", action="store_true")
+    # parser.add_argument("--prime", action="store_true")
     # parser.add_argument("--is_map", action="store_true")
     parser.add_argument("--seed", type=int, help="random seed")
     parser.add_argument("--data_path", type=str, default="./data/")
     parser.add_argument("--file_path", type=str, help="./app/")
-    parser.add_argument("--style", type=int, help="style number")
+    parser.add_argument("--style", type=int, help="style number [0,4]")
     args = parser.parse_args()
 
     return args
@@ -139,44 +139,51 @@ if __name__ == "__main__":
 
     model_path = args.model_path
     model = args.model
+    prime = True if args.style is not None else False
 
     train_dataset = HandwritingDataset(
         args.data_path, split="train", text_req=args.text_req
     )
 
-    if args.prime and args.file_path:
-        style = np.load(
-            args.file_path + "style.npy", allow_pickle=True, encoding="bytes"
-        ).astype(np.float32)
-        with open(args.file_path + "inpText.txt") as file:
-            texts = file.read().splitlines()
-        real_text = texts[0]
+    if args.style is not None:  # args.prime and 
+        # style = np.load(
+        #     args.file_path + "style.npy", allow_pickle=True, encoding="bytes"
+        # ).astype(np.float32)
+        # with open(args.file_path + "inpText.txt") as file:
+        #     texts = file.read().splitlines()
+        # real_text = texts[0]
+        styles = np.load('./styles/style_strokes.npy', allow_pickle=True)
+        texts = np.load('./styles/style_sents.npy', allow_pickle=True)
+        real_text = texts[args.style]
+        style = styles[args.style]
         # plot the sequence
         plot_stroke(style, save_name=args.save_path / "style.png")
-        print(real_text)
-        mean, std, _ = data_normalization(style)
-        style = torch.from_numpy(style).unsqueeze(0).to(device)
-        print(style.shape)
-        ytext = real_text + " " + args.char_seq + "  "
-    elif args.prime:
-        strokes = np.load(
-            args.data_path + "strokes.npy", allow_pickle=True, encoding="bytes"
-        )
-        with open(args.data_path + "sentences.txt") as file:
-            texts = file.read().splitlines()
-        idx = 5290  # np.random.randint(0, len(strokes))
-        print("Prime style index: ", idx)
-        real_text = texts[idx]
-        style = strokes[idx]
-        # plot the sequence
-        plot_stroke(style, save_name=args.save_path /
-                    ("style_" + str(idx) + ".png"))
-        print(real_text)
+        # print(real_text)
         mean, std, _ = data_normalization(style)
         style = np.array([style for i in range(args.batch_size)])
         style = torch.from_numpy(style).to(device)
-        print(style.shape)
+        # style = torch.from_numpy(style).unsqueeze(0).to(device)
+        # print(style.shape)
         ytext = real_text + " " + args.char_seq + "  "
+    # elif args.prime:
+    #     strokes = np.load(
+    #         args.data_path + "strokes.npy", allow_pickle=True, encoding="bytes"
+    #     )
+    #     with open(args.data_path + "sentences.txt") as file:
+    #         texts = file.read().splitlines()
+    #     idx = np.random.randint(0, len(strokes))
+    #     print("Prime style index: ", idx)
+    #     real_text = texts[idx]
+    #     style = strokes[idx]
+    #     # plot the sequence
+    #     plot_stroke(style, save_name=args.save_path /
+    #                 ("style_" + str(idx) + ".png"))
+    #     print(real_text)
+    #     mean, std, _ = data_normalization(style)
+    #     style = np.array([style for i in range(args.batch_size)])
+    #     style = torch.from_numpy(style).to(device)
+    #     print(style.shape)
+    #     ytext = real_text + " " + args.char_seq + "  "
     else:
         idx = -1
         real_text = ""
@@ -186,13 +193,13 @@ if __name__ == "__main__":
     if model == "prediction":
         gen_seq = generate_unconditional_seq(model_path, args.seq_len, device,
                                              args.bias, style=style,
-                                             prime=args.prime)
+                                             prime=prime)
     elif model == "synthesis":
         gen_seq, phi = generate_conditional_sequence(model_path, args.char_seq,
                                                      device,
                                                      train_dataset.char_to_id,
                                                      train_dataset.idx_to_char,
-                                                     args.bias, args.prime,
+                                                     args.bias, prime,
                                                      style, real_text,
                                                      False,              # TODO: Remove args.is_map's trace
                                                      args.batch_size)
