@@ -1,27 +1,26 @@
+import math
+import os
+import argparse
+import time
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.optim.lr_scheduler import StepLR
+from torch.utils.data import DataLoader
+from models.models import HandWritingPredictionNet, HandWritingSynthesisNet
 from generate import generate_conditional_sequence, generate_unconditional_seq
 from utils.data_utils import data_denormalization
 from utils.model_utils import compute_nll_loss
 from utils.dataset import HandwritingDataset
 from utils.constants import Global
 from utils import plot_stroke
-from models.models import HandWritingPredictionNet, HandWritingSynthesisNet
-import matplotlib.pyplot as plt
-import torch
-import math
-import os
-import torch.nn as nn
-import numpy as np
-import argparse
-import torch.optim as optim
-from torch.optim.lr_scheduler import StepLR
 # from torch.utils import data
-from torch.utils.data import DataLoader
 # from torch.distributions import bernoulli, uniform
 # import torch.nn.functional as F
-import time
-import matplotlib
-
-matplotlib.use("Agg")
+# import matplotlib
+# matplotlib.use("Agg")
 
 
 def argparser():
@@ -98,7 +97,7 @@ def train_epoch(model, optimizer, epoch, train_loader, device, model_type):
         # print every 10 mini-batches
         if i % 10 == 0:
             print(
-                "[Epoch: {:d}, MB: {:5d}] loss: {:.3f}".format(
+                "[Epoch: {:d}, MiniBatch: {:5d}] loss: {:.3f}".format(
                     epoch + 1, i + 1, loss / batch_size)
             )
     avg_loss /= len(train_loader.dataset)
@@ -155,7 +154,7 @@ def validation(model, valid_loader, device, epoch, model_type):
 
 def train(model, train_loader, valid_loader, batch_size, n_epochs, lr,
           patience, step_size, device, model_type, save_path):
-    model_path = save_path + "best_model_" + model_type + ".pt"
+    model_path = save_path + "model_" + model_type + ".pt"
     model = model.to(device)
     """
     #TODO
@@ -196,7 +195,7 @@ def train(model, train_loader, valid_loader, batch_size, n_epochs, lr,
         if valid_loss < best_loss:
             best_loss = valid_loss
             best_epoch = epoch + 1
-            print("[SAVE] Saving best model at epoch {}".format(epoch + 1))
+            print("[SAVE] Saving weights at epoch: {}".format(epoch + 1))
             torch.save(model.state_dict(), model_path)
             if model_type == "prediction":
                 gen_seq = generate_unconditional_seq(model_path, 700, device,

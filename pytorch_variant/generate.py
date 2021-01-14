@@ -1,10 +1,10 @@
 import torch
 import numpy as np
 import argparse
-# import matplotlib
-from pathlib import Path
 # import os
+import matplotlib
 import matplotlib.pyplot as plt
+from pathlib import Path
 from utils import plot_stroke
 from utils.constants import Global
 from utils.dataset import HandwritingDataset
@@ -20,20 +20,21 @@ def argparser():
     parser.add_argument(
         "--model_path",
         type=Path,
-        default="./results/synthesis/best_model_synthesis_4.pt",
+        default="./pretrained/model_synthesis.pt",
     )
     parser.add_argument("--save_path", type=Path, default="./results/")
     parser.add_argument("--seq_len", type=int, default=400)
     parser.add_argument("--batch_size", type=int, default=1)
     parser.add_argument("--bias", type=float, default=10.0, help="bias")
     parser.add_argument("--char_seq", type=str,
-                        default="This is real handwriting")
+                        default="A sample of generated handwriting")
     parser.add_argument("--text_req", action="store_true")
     parser.add_argument("--prime", action="store_true")
-    parser.add_argument("--is_map", action="store_true")
+    # parser.add_argument("--is_map", action="store_true")
     parser.add_argument("--seed", type=int, help="random seed")
     parser.add_argument("--data_path", type=str, default="./data/")
     parser.add_argument("--file_path", type=str, help="./app/")
+    parser.add_argument("--style", type=int, help="style number")
     args = parser.parse_args()
 
     return args
@@ -67,7 +68,6 @@ def generate_conditional_sequence(model_path, char_seq, device, char_to_id,
                                   real_text, is_map, batch_size=1):
 
     model = HandWritingSynthesisNet(window_size=len(char_to_id))
-    print("Vocab size: ", len(char_to_id))
     # load the best model
     model.load_state_dict(torch.load(model_path, map_location=device))
 
@@ -109,7 +109,8 @@ def generate_conditional_sequence(model_path, char_seq, device, char_to_id,
                              hidden, window_vector, kappa, bias, is_map,
                              prime=prime)
 
-    length = len(text_mask.nonzero())
+    # length = len(text_mask.nonzero())
+    length = len(torch.nonzero(text_mask, as_tuple=False).to(text_mask.device))
     print("Input seq: ", "".join(idx_to_char(
         text[0].detach().cpu().numpy()))[:length])
     print("Length of input sequence: ", text[0].shape[0])
@@ -163,7 +164,7 @@ if __name__ == "__main__":
         )
         with open(args.data_path + "sentences.txt") as file:
             texts = file.read().splitlines()
-        idx = np.random.randint(0, len(strokes))
+        idx = 5290  # np.random.randint(0, len(strokes))
         print("Prime style index: ", idx)
         real_text = texts[idx]
         style = strokes[idx]
@@ -193,18 +194,18 @@ if __name__ == "__main__":
                                                      train_dataset.idx_to_char,
                                                      args.bias, args.prime,
                                                      style, real_text,
-                                                     args.is_map,
+                                                     False,              # TODO: Remove args.is_map's trace
                                                      args.batch_size)
-        if args.is_map:
-            plt.imshow(phi, cmap="viridis", aspect="auto")
-            plt.colorbar()
-            plt.xlabel("time steps")
-            plt.yticks(np.arange(phi.shape[0]), list(
-                ytext), rotation="horizontal")
-            plt.margins(0.2)
-            plt.subplots_adjust(bottom=0.15)
-            plt.savefig("heat_map.png")
-            plt.close()
+        # if args.is_map:
+        #     plt.imshow(phi, cmap="viridis", aspect="auto")
+        #     plt.colorbar()
+        #     plt.xlabel("time steps")
+        #     plt.yticks(np.arange(phi.shape[0]), list(
+        #         ytext), rotation="horizontal")
+        #     plt.margins(0.2)
+        #     plt.subplots_adjust(bottom=0.15)
+        #     plt.savefig("heat_map.png")
+        #     plt.close()
 
     # denormalize the generated offsets using train set mean and std
     # if args.prime:

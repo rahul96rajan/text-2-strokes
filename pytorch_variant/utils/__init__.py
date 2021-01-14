@@ -1,8 +1,7 @@
 import numpy
-import matplotlib
-
-matplotlib.use("AGG")
+# import matplotlib
 from matplotlib import pyplot
+# matplotlib.use("AGG")
 
 
 def plot_stroke(stroke, save_name=None):
