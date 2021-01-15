@@ -1,7 +1,7 @@
 import torch
 import math
 import torch.nn as nn
-from torch.distributions import bernoulli, uniform
+from torch.distributions import bernoulli  # , uniform
 from utils.model_utils import stable_softmax
 
 

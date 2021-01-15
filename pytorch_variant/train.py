@@ -3,7 +3,7 @@ import os
 import argparse
 import time
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -96,10 +96,12 @@ def train_epoch(model, optimizer, epoch, train_loader, device, model_type):
 
         # print every 10 mini-batches
         if i % 10 == 0:
-            print(
-                "[Epoch: {:d}, MiniBatch: {:5d}] loss: {:.3f}".format(
-                    epoch + 1, i + 1, loss / batch_size)
-            )
+            # print(
+            #     "\t[Epoch: {:d}, MiniBatch: {:5d}] loss: {:.3f}".format(
+            #         epoch + 1, i + 1, loss / batch_size)
+            # )
+            print("\t[MiniBatch: {:3d}] loss: {:.3f}".format(
+                    i + 1, loss / batch_size))
     avg_loss /= len(train_loader.dataset)
 
     return avg_loss
@@ -142,7 +144,7 @@ def validation(model, valid_loader, device, epoch, model_type):
             # print every 10 mini-batches
             if i % 10 == 0:
                 print(
-                    "[Epoch: {:d}, MB: {:5d}] loss: {:.3f}".format(
+                    "[Epoch: {:d}, MiniBatch: {:3d}] loss: {:.3f}".format(
                         epoch + 1, i + 1, loss / batch_size
                     )
                 )
@@ -176,6 +178,7 @@ def train(model, train_loader, valid_loader, batch_size, n_epochs, lr,
     k = 0
     for epoch in range(n_epochs):
         start_time = time.time()
+        print(f"[Epoch {epoch + 1}]")
         print("[INFO] Training Model.....")
         train_loss = train_epoch(model, optimizer, epoch, train_loader,
                                  device, model_type)
@@ -191,8 +194,8 @@ def train(model, train_loader, valid_loader, batch_size, n_epochs, lr,
         print(f"Epoch {epoch + 1}: Valid: avg. loss: {valid_loss:.3f}")
         """
 
-        print(f"Epoch {epoch + 1}/{n_epochs}\tTrain loss: {train_loss:.3f}\t"
-              f"Val loss: {valid_loss:.3f}")
+        print(f"[RESULT] Epoch {epoch + 1}/{n_epochs}"  
+              f"\tTrain loss: {train_loss:.3f}\tVal loss: {valid_loss:.3f}")
 
         if step_size != -1:
             scheduler.step()
