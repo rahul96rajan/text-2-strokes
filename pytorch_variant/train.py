@@ -164,7 +164,7 @@ def train(model, train_loader, valid_loader, batch_size, n_epochs, lr,
     k = 0
     for epoch in range(n_epochs):
         start_time = time.time()
-        print(f"[Epoch {epoch + 1}]")
+        print(f"[Epoch {epoch + 1}/{n_epochs}]")
         print("[INFO] Training Model.....")
         train_loss = train_epoch(model, optimizer, epoch, train_loader,
                                  device, model_type)

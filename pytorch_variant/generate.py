@@ -62,7 +62,7 @@ def generate_unconditional_seq(model_path, seq_len, device, bias, style,
 
 def generate_conditional_sequence(model_path, char_seq, device, char_to_id,
                                   idx_to_char, bias, prime, prime_seq,
-                                  real_text, batch_size=1):  # is_map,
+                                  real_text, batch_size=1):
 
     model = HandWritingSynthesisNet(window_size=len(char_to_id))
     # load the best model
