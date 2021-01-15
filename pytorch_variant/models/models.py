@@ -218,7 +218,7 @@ class HandWritingSynthesisNet(nn.Module):
         self.n_layers = n_layers
         K = 10                      # Number of Gaussian Functions
         self.EOS = False
-        self._phi = []              # Equation 46
+        # self._phi = []              # Equation 46
 
         self.lstm_1 = nn.LSTM(3 + self.vocab_size,
                               hidden_size, batch_first=True)
@@ -260,7 +260,7 @@ class HandWritingSynthesisNet(nn.Module):
         return encoding
 
     def compute_window_vector(self, mix_params, prev_kappa, text, text_mask,
-                              is_map):
+                              ):  # is_map
         encoding = self.one_hot_encoding(text)
         mix_params = torch.exp(mix_params)
 
@@ -276,8 +276,8 @@ class HandWritingSynthesisNet(nn.Module):
         if phi[0, -1] > torch.max(phi[0, :-1]):
             self.EOS = True
         phi = (phi * text_mask).unsqueeze(2)
-        if is_map:
-            self._phi.append(phi.squeeze(dim=2).unsqueeze(1))
+        # if is_map:
+        #     self._phi.append(phi.squeeze(dim=2).unsqueeze(1))
 
         window_vec = torch.sum(phi * encoding, dim=1, keepdim=True)
         return window_vec, prev_kappa
@@ -300,7 +300,7 @@ class HandWritingSynthesisNet(nn.Module):
         nn.init.constant_(self.output_layer.bias, 0.0)
 
     def forward(self, inputs, text, text_mask, initial_hidden, prev_window_vec,
-                prev_kappa, is_map=False):
+                prev_kappa):  # is_map=False
 
         hid_1 = []
         window_vec = []
@@ -319,7 +319,7 @@ class HandWritingSynthesisNet(nn.Module):
                 prev_kappa,
                 text,
                 text_mask,
-                is_map,
+                # is_map,
             )
 
             prev_window_vec = window
@@ -345,7 +345,8 @@ class HandWritingSynthesisNet(nn.Module):
         return y_hat, [state_1, state_2, state_3], window_vec, prev_kappa
 
     def generate(self, inp, text, text_mask, prime_text, prime_mask, hidden,
-                 window_vector, kappa, bias, is_map=False, prime=False):
+                 window_vector, kappa, bias, prime=False):
+        # is_map = False
         seq_len = 0
         gen_seq = []
         with torch.no_grad():
@@ -354,7 +355,7 @@ class HandWritingSynthesisNet(nn.Module):
             if prime:
                 y_hat, state, window_vector, kappa = self.forward(
                     inp, prime_text, prime_mask, hidden, window_vector, kappa,
-                    is_map
+                    # is_map
                 )
 
                 _hidden = torch.cat([s[0] for s in state], dim=0)
@@ -376,7 +377,7 @@ class HandWritingSynthesisNet(nn.Module):
 
             while not self.EOS and seq_len < 2000:
                 y_hat, state, window_vector, kappa = self.forward(
-                    inp, text, text_mask, hidden, window_vector, kappa, is_map
+                    inp, text, text_mask, hidden, window_vector, kappa, # is_map
                 )
 
                 _hidden = torch.cat([s[0] for s in state], dim=0)

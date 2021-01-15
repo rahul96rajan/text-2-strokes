@@ -39,7 +39,7 @@ def argparser():
     parser.add_argument("--save_path", type=str, default="./logs/")
     parser.add_argument("--text_req", action="store_true")
     parser.add_argument("--data_aug", action="store_true")
-    parser.add_argument("--debug", action="store_true")
+    parser.add_argument("--debug", action="store_true")     # Remove flag
     parser.add_argument("--seed", type=int, default=212, help="random seed")
     args = parser.parse_args()
 
@@ -203,7 +203,7 @@ def train(model, train_loader, valid_loader, batch_size, n_epochs, lr,
                                                      prime=False)
 
             else:
-                gen_seq, phi = generate_conditional_sequence(
+                gen_seq = generate_conditional_sequence( # , phi
                     model_path,
                     "Hello world!",
                     device,
@@ -212,19 +212,19 @@ def train(model, train_loader, valid_loader, batch_size, n_epochs, lr,
                     bias=10.0,
                     prime=False,
                     prime_seq=None,
-                    real_text=None,
-                    is_map=True,
+                    real_text=None
+                    # is_map=True,
                 )
 
-                plt.imshow(phi, cmap="viridis", aspect="auto")
-                plt.colorbar()
-                plt.xlabel("time steps")
-                plt.yticks(np.arange(phi.shape[1]), list("Hello world!  "),
-                           rotation="horizontal")
-                plt.margins(0.2)
-                plt.subplots_adjust(bottom=0.15)
-                plt.savefig(save_path + "heat_map" + str(best_epoch) + ".png")
-                plt.close()
+                # plt.imshow(phi, cmap="viridis", aspect="auto")
+                # plt.colorbar()
+                # plt.xlabel("time steps")
+                # plt.yticks(np.arange(phi.shape[1]), list("Hello world!  "),
+                #            rotation="horizontal")
+                # plt.margins(0.2)
+                # plt.subplots_adjust(bottom=0.15)
+                # plt.savefig(save_path + "heat_map" + str(best_epoch) + ".png")
+                # plt.close()
             # denormalize the generated offsets using train set mean and std
             gen_seq = data_denormalization(
                 Global.train_mean, Global.train_std, gen_seq)
