@@ -33,7 +33,7 @@ def argparser():
     # parser.add_argument("--is_map", action="store_true")
     parser.add_argument("--seed", type=int, help="random seed")
     parser.add_argument("--data_path", type=str, default="./data/")
-    parser.add_argument("--file_path", type=str, help="./app/")
+    # parser.add_argument("--file_path", type=str, help="./app/")
     parser.add_argument("--style", type=int, help="style number [0,4]")
     args = parser.parse_args()
 
@@ -65,7 +65,7 @@ def generate_unconditional_seq(model_path, seq_len, device, bias, style,
 
 def generate_conditional_sequence(model_path, char_seq, device, char_to_id,
                                   idx_to_char, bias, prime, prime_seq,
-                                  real_text, is_map, batch_size=1):
+                                  real_text, batch_size=1):  # is_map,
 
     model = HandWritingSynthesisNet(window_size=len(char_to_id))
     # load the best model
@@ -106,8 +106,8 @@ def generate_conditional_sequence(model_path, char_seq, device, char_to_id,
 
     print("Generating sequence....")
     gen_seq = model.generate(inp, text, text_mask, prime_text, prime_mask,
-                             hidden, window_vector, kappa, bias, is_map,
-                             prime=prime)
+                             hidden, window_vector, kappa, bias,  # TODO
+                             prime=prime)  # is_map,
 
     # length = len(text_mask.nonzero())
     length = len(torch.nonzero(text_mask, as_tuple=False).to(text_mask.device))
@@ -115,13 +115,13 @@ def generate_conditional_sequence(model_path, char_seq, device, char_to_id,
         text[0].detach().cpu().numpy()))[:length])
     print("Length of input sequence: ", text[0].shape[0])
 
-    if is_map:
-        phi = torch.cat(model._phi, dim=1).cpu().numpy()
-        phi = phi[0].T
-    else:
-        phi = []
+    # if is_map:
+    #     phi = torch.cat(model._phi, dim=1).cpu().numpy()
+    #     phi = phi[0].T
+    # else:
+    #     phi = []
 
-    return gen_seq, phi
+    return gen_seq  # , phi
 
 
 if __name__ == "__main__":
@@ -145,7 +145,7 @@ if __name__ == "__main__":
         args.data_path, split="train", text_req=args.text_req
     )
 
-    if args.style is not None:  # args.prime and 
+    if args.style is not None:  # args.prime and
         # style = np.load(
         #     args.file_path + "style.npy", allow_pickle=True, encoding="bytes"
         # ).astype(np.float32)
@@ -167,7 +167,7 @@ if __name__ == "__main__":
         ytext = real_text + " " + args.char_seq + "  "
     # elif args.prime:
     #     strokes = np.load(
-    #         args.data_path + "strokes.npy", allow_pickle=True, encoding="bytes"
+    #       args.data_path + "strokes.npy", allow_pickle=True, encoding="bytes"
     #     )
     #     with open(args.data_path + "sentences.txt") as file:
     #         texts = file.read().splitlines()
@@ -195,14 +195,14 @@ if __name__ == "__main__":
                                              args.bias, style=style,
                                              prime=prime)
     elif model == "synthesis":
-        gen_seq, phi = generate_conditional_sequence(model_path, args.char_seq,
-                                                     device,
-                                                     train_dataset.char_to_id,
-                                                     train_dataset.idx_to_char,
-                                                     args.bias, prime,
-                                                     style, real_text,
-                                                     False,              # TODO: Remove args.is_map's trace
-                                                     args.batch_size)
+        gen_seq = generate_conditional_sequence(model_path, args.char_seq, # , phi
+                                                device,
+                                                train_dataset.char_to_id,
+                                                train_dataset.idx_to_char,
+                                                args.bias, prime,
+                                                style, real_text,
+                                                # False,              # TODO: Remove args.is_map's trace
+                                                args.batch_size)
         # if args.is_map:
         #     plt.imshow(phi, cmap="viridis", aspect="auto")
         #     plt.colorbar()
