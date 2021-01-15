@@ -1,7 +1,9 @@
+import json
+import codecs
 import torch
 import numpy as np
 import argparse
-# import os
+import os
 # import matplotlib
 # import matplotlib.pyplot as plt
 from pathlib import Path
@@ -24,7 +26,7 @@ def argparser():
     )
     parser.add_argument("--save_path", type=Path, default="./results/")
     parser.add_argument("--seq_len", type=int, default=400)
-    parser.add_argument("--batch_size", type=int, default=1)
+    # parser.add_argument("--batch_size", type=int, default=1)
     parser.add_argument("--bias", type=float, default=10.0, help="bias")
     parser.add_argument("--char_seq", type=str,
                         default="A sample of generated handwriting")
@@ -35,6 +37,7 @@ def argparser():
     parser.add_argument("--data_path", type=str, default="./data/")
     # parser.add_argument("--file_path", type=str, help="./app/")
     parser.add_argument("--style", type=int, help="style number [0,4]")
+    parser.add_argument("--save_img", action="store_true")
     args = parser.parse_args()
 
     return args
@@ -111,9 +114,9 @@ def generate_conditional_sequence(model_path, char_seq, device, char_to_id,
 
     # length = len(text_mask.nonzero())
     length = len(torch.nonzero(text_mask, as_tuple=False).to(text_mask.device))
-    print("Input seq: ", "".join(idx_to_char(
+    print("Input text:", "".join(idx_to_char(
         text[0].detach().cpu().numpy()))[:length])
-    print("Length of input sequence: ", text[0].shape[0])
+    print("Length of input text:", text[0].shape[0])
 
     # if is_map:
     #     phi = torch.cat(model._phi, dim=1).cpu().numpy()
@@ -157,10 +160,11 @@ if __name__ == "__main__":
         real_text = texts[args.style]
         style = styles[args.style]
         # plot the sequence
-        plot_stroke(style, save_name=args.save_path / "style.png")
+        # plot_stroke(style, save_name=args.save_path / "style.png")
         # print(real_text)
         mean, std, _ = data_normalization(style)
-        style = np.array([style for i in range(args.batch_size)])
+        style = np.expand_dims(style, axis=0)
+        # style = np.array([style for i in range(args.batch_size)])
         style = torch.from_numpy(style).to(device)
         # style = torch.from_numpy(style).unsqueeze(0).to(device)
         # print(style.shape)
@@ -200,9 +204,9 @@ if __name__ == "__main__":
                                                 train_dataset.char_to_id,
                                                 train_dataset.idx_to_char,
                                                 args.bias, prime,
-                                                style, real_text,
+                                                style, real_text)
                                                 # False,              # TODO: Remove args.is_map's trace
-                                                args.batch_size)
+                                                # args.batch_size)
         # if args.is_map:
         #     plt.imshow(phi, cmap="viridis", aspect="auto")
         #     plt.colorbar()
@@ -221,10 +225,35 @@ if __name__ == "__main__":
     # else:
     gen_seq = data_denormalization(
         Global.train_mean, Global.train_std, gen_seq)
+    gen_seq = np.squeeze(gen_seq)
 
     # plot the sequence
-    for i in range(args.batch_size):
-        plot_stroke(
-            gen_seq[i], save_name=args.save_path /
-            ("gen_seq_" + str(i) + ".png")
-        )
+    if args.save_img:
+        img_path = os.path.join(str(args.save_path),
+                                "gen_img.png")
+        plot_stroke(gen_seq, save_name=img_path)
+        print(f"Image saved as: {img_path}")
+
+    # Export generated sequence as json
+    seq_list = gen_seq.tolist()
+    json_file_path = os.path.join(str(args.save_path), "generated_seq.json")
+    json.dump(seq_list,
+              codecs.open(json_file_path, 'w', encoding='utf-8'),
+              separators=(',', ':'), sort_keys=True, indent=4)
+    print(f"Sequence saved to json: {json_file_path}")
+
+    # for i in range(args.batch_size):
+    #     if args.save_img:
+    #         # plot the sequence
+    #         img_path = os.path.join(str(args.save_path),
+    #                                 "gen_img_" + str(i) + ".png")
+    #         plot_stroke(gen_seq[i], save_name=img_path)
+    #         print(f"Image {i} saved as: {img_path}")
+
+    #     seq_list = gen_seq[i].tolist()
+    #     json_file_path = os.path.join(str(args.save_path),
+    #                                   "generated_seq_" + str(i) + ".json")
+    #     json.dump(seq_list,
+    #               codecs.open(json_file_path, 'w', encoding='utf-8'),
+    #               separators=(',', ':'), sort_keys=True, indent=4)
+    #     print(f"Sequence {i} saved to json: {json_file_path}")

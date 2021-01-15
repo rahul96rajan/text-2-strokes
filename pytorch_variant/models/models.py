@@ -351,7 +351,7 @@ class HandWritingSynthesisNet(nn.Module):
         gen_seq = []
         with torch.no_grad():
             batch_size = inp.shape[0]
-            print("batch_size:", batch_size)
+            # print("batch_size:", batch_size)
             if prime:
                 y_hat, state, window_vector, kappa = self.forward(
                     inp, prime_text, prime_mask, hidden, window_vector, kappa,
@@ -396,7 +396,7 @@ class HandWritingSynthesisNet(nn.Module):
         gen_seq = torch.cat(gen_seq, dim=1)
         gen_seq = gen_seq.cpu().numpy()
 
-        print("EOS:", self.EOS)
-        print("seq_len:", seq_len)
+        # print("EOS:", self.EOS)
+        print("Lenght of generated sequence:", seq_len)
 
         return gen_seq
