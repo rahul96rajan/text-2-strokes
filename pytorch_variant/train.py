@@ -161,6 +161,11 @@ def train(model, train_loader, valid_loader, batch_size, n_epochs, lr,
     model.load_state_dict(torch.load(model_path))
     print(f"[INFO] Loaded model weights from '{model_path}'")
     """
+    if os.path.isfile(model_path):
+        model.load_state_dict(torch.load(model_path))
+        print(f"[ACTION] Loaded model weights from '{model_path}'")
+    else:
+        print("[INFO] No saved weights found, training from scratch.")
     optimizer = optim.Adam(model.parameters(), lr=lr)
     scheduler = StepLR(optimizer, step_size=step_size, gamma=0.1)
 
