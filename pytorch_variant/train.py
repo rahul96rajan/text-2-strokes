@@ -39,7 +39,6 @@ def argparser():
     parser.add_argument("--save_path", type=str, default="./logs/")
     parser.add_argument("--text_req", action="store_true")
     parser.add_argument("--data_aug", action="store_true")
-    parser.add_argument("--debug", action="store_true")     # Remove flag
     parser.add_argument("--seed", type=int, default=212, help="random seed")
     args = parser.parse_args()
 
@@ -158,11 +157,7 @@ def train(model, train_loader, valid_loader, batch_size, n_epochs, lr,
           patience, step_size, device, model_type, save_path):
     model_path = save_path + "model_" + model_type + ".pt"
     model = model.to(device)
-    """
-    #TODO
-    model.load_state_dict(torch.load(model_path))
-    print(f"[INFO] Loaded model weights from '{model_path}'")
-    """
+
     if os.path.isfile(model_path):
         model.load_state_dict(torch.load(model_path))
         print(f"[ACTION] Loaded model weights from '{model_path}'")
@@ -279,12 +274,10 @@ if __name__ == "__main__":
     # Load the data and text
     train_dataset = HandwritingDataset(args.data_path, split="train",
                                        text_req=args.text_req,
-                                       debug=args.debug,
-                                       data_aug=args.data_aug,)
+                                       data_aug=args.data_aug)
 
     valid_dataset = HandwritingDataset(args.data_path, split="valid",
                                        text_req=args.text_req,
-                                       debug=args.debug,
                                        data_aug=args.data_aug)
 
     train_loader = DataLoader(

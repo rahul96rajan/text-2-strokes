@@ -109,8 +109,8 @@ def generate_conditional_sequence(model_path, char_seq, device, char_to_id,
 
     print("Generating sequence....")
     gen_seq = model.generate(inp, text, text_mask, prime_text, prime_mask,
-                             hidden, window_vector, kappa, bias,  # TODO
-                             prime=prime)  # is_map,
+                             hidden, window_vector, kappa, bias,
+                             prime=prime)
 
     # length = len(text_mask.nonzero())
     length = len(torch.nonzero(text_mask, as_tuple=False).to(text_mask.device))
@@ -199,14 +199,12 @@ if __name__ == "__main__":
                                              args.bias, style=style,
                                              prime=prime)
     elif model == "synthesis":
-        gen_seq = generate_conditional_sequence(model_path, args.char_seq, # , phi
+        gen_seq = generate_conditional_sequence(model_path, args.char_seq,
                                                 device,
                                                 train_dataset.char_to_id,
                                                 train_dataset.idx_to_char,
                                                 args.bias, prime,
                                                 style, real_text)
-                                                # False,              # TODO: Remove args.is_map's trace
-                                                # args.batch_size)
         # if args.is_map:
         #     plt.imshow(phi, cmap="viridis", aspect="auto")
         #     plt.colorbar()

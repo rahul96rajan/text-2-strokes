@@ -10,8 +10,8 @@ from utils.constants import Global
 class HandwritingDataset(Dataset):
     """Handwriting dataset."""
 
-    def __init__(self, data_path, split='train', text_req=False, debug=False,
-                 max_seq_len=300, data_aug=False):  # TODO: remove debug flag
+    def __init__(self, data_path, split='train', text_req=False,
+                 max_seq_len=300, data_aug=False):
         """
         Args:
             data_path (string): Path to the data folder.
@@ -32,11 +32,8 @@ class HandwritingDataset(Dataset):
         n_total = len(strokes)
 
         # Mask - Padding (strokes data)
-        """
-        #TODO Rename mask to mask_sequence to reduce confusion.
-        """
         mask_shape = (n_total, max_len)
-        mask = np.zeros(mask_shape, dtype=np.float32)
+        sequence_mask = np.zeros(mask_shape, dtype=np.float32)
 
         # Convert list of str into array of list of chars
         char_seqs = [list(char_seq) for char_seq in texts]
@@ -54,15 +51,12 @@ class HandwritingDataset(Dataset):
         inp_text[:, :] = ' '
 
         # Convert list of stroke(array) into ndarray of size(n_total,max_len,3)
-        """
-        #TODO Rename data to stroke_data to reduce confusion.
-        """
         data_shape = (n_total, max_len, 3)
-        data = np.zeros(data_shape, dtype=np.float32)
+        strokes_data = np.zeros(data_shape, dtype=np.float32)
 
         for i, (seq_len, text_len) in enumerate(zip(lengths, char_lens)):
-            mask[i, :seq_len] = 1.
-            data[i, :seq_len] = strokes[i]
+            sequence_mask[i, :seq_len] = 1.
+            strokes_data[i, :seq_len] = strokes[i]
             char_mask[i, :text_len] = 1.
             inp_text[i, :text_len] = char_seqs[i]
 
@@ -71,8 +65,8 @@ class HandwritingDataset(Dataset):
         self.vocab_size = len(self.id_to_char)
 
         idx_permute = np.random.permutation(n_total)
-        data = data[idx_permute]
-        mask = mask[idx_permute]
+        strokes_data = strokes_data[idx_permute]
+        sequence_mask = sequence_mask[idx_permute]
         inp_text = inp_text[idx_permute]
         char_mask = char_mask[idx_permute]
 
@@ -83,19 +77,19 @@ class HandwritingDataset(Dataset):
         #     inp_text = inp_text[:64]
         #     char_mask = char_mask[:64]
 
-        n_train = int(0.9 * data.shape[0])
-        self._data = data
+        n_train = int(0.9 * strokes_data.shape[0])
+        self._data = strokes_data
         if split == 'train':
-            self.dataset = data[:n_train]
-            self.mask = mask[:n_train]
+            self.dataset = strokes_data[:n_train]
+            self.mask = sequence_mask[:n_train]
             self.texts = inp_text[:n_train]
             self.char_mask = char_mask[:n_train]
             Global.train_mean, Global.train_std, self.dataset = \
                 train_offset_normalization(self.dataset)
 
         elif split == 'valid':
-            self.dataset = data[n_train:]
-            self.mask = mask[n_train:]
+            self.dataset = strokes_data[n_train:]
+            self.mask = sequence_mask[n_train:]
             self.texts = inp_text[n_train:]
             self.char_mask = char_mask[n_train:]
             self.dataset = valid_offset_normalization(
@@ -117,12 +111,6 @@ class HandwritingDataset(Dataset):
             counter.update(text)
         unique_char = sorted(counter)
         vocab_size = len(unique_char)
-        """
-        TODO : Replace with
-        id_to_char = dict(zip(np.arange(vocab_size), unique_char))
-        char_to_id = dict([(v, k) for (k, v) in id_to_char.items()])
-        return id_to_char, char_to_id
-        """
         id_to_char_dic = {k: v for k, v in zip(range(vocab_size), unique_char)}
         char_to_id_dic = {v: k for k, v in id_to_char_dic.items()}
         return id_to_char_dic, char_to_id_dic
