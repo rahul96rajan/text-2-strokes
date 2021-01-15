@@ -192,7 +192,7 @@ def train(model, train_loader, valid_loader, batch_size, n_epochs, lr,
                                                      prime=False)
 
             else:
-                gen_seq = generate_conditional_sequence( # , phi
+                gen_seq = generate_conditional_sequence(
                     model_path,
                     "Hello world!",
                     device,
