@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 def plot_stroke(stroke, save_name=None):
     # Plot a single example.
-    f, ax = plt.subplotp
+    f, ax = plt.subplots()
     x = np.cumsum(stroke[:, 1])
     y = np.cumsum(stroke[:, 2])
 
