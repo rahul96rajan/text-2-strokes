@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 from collections import Counter
-from torch.utils.data import Dataset  # DataLoader,
+from torch.utils.data import Dataset
 from utils.data_utils import train_offset_normalization,\
                              valid_offset_normalization
 from utils.constants import Global
@@ -37,7 +37,7 @@ class HandwritingDataset(Dataset):
 
         # Convert list of str into array of list of chars
         char_seqs = [list(char_seq) for char_seq in texts]
-        char_seqs = np.asarray(char_seqs)
+        char_seqs = np.asarray(char_seqs, dtype=object)
 
         char_lens = [len(char_seq) for char_seq in char_seqs]
         max_char_len = np.max(char_lens)
@@ -69,13 +69,6 @@ class HandwritingDataset(Dataset):
         sequence_mask = sequence_mask[idx_permute]
         inp_text = inp_text[idx_permute]
         char_mask = char_mask[idx_permute]
-
-        """OBSOLETE"""
-        # if debug:
-        #     data = data[:64]
-        #     mask = mask[:64]
-        #     inp_text = inp_text[:64]
-        #     char_mask = char_mask[:64]
 
         n_train = int(0.9 * strokes_data.shape[0])
         self._data = strokes_data
@@ -129,7 +122,6 @@ class HandwritingDataset(Dataset):
             char_mask = torch.from_numpy(self.char_mask[idx])
             return (input_seq, target, mask, text, char_mask)
         elif self.data_aug:
-            # seq_len = len(mask.nonzero())
             seq_len = len(torch.nonzero(mask, as_tuple=False).to(mask.device))
             start = 0
             end = self.max_seq_len

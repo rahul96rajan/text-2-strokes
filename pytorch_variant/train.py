@@ -3,7 +3,6 @@ import os
 import argparse
 import time
 import numpy as np
-# import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -16,11 +15,6 @@ from utils.model_utils import compute_nll_loss
 from utils.dataset import HandwritingDataset
 from utils.constants import Global
 from utils import plot_stroke
-# from torch.utils import data
-# from torch.distributions import bernoulli, uniform
-# import torch.nn.functional as F
-# import matplotlib
-# matplotlib.use("Agg")
 
 
 def argparser():
@@ -95,12 +89,9 @@ def train_epoch(model, optimizer, epoch, train_loader, device, model_type):
 
         # print every 10 mini-batches
         if i % 10 == 0:
-            # print(
-            #     "\t[Epoch: {:d}, MiniBatch: {:5d}] loss: {:.3f}".format(
-            #         epoch + 1, i + 1, loss / batch_size)
-            # )
             print("\t[MiniBatch: {:3d}] loss: {:.3f}".format(
                     i + 1, loss / batch_size))
+
     avg_loss /= len(train_loader.dataset)
 
     return avg_loss
@@ -173,7 +164,7 @@ def train(model, train_loader, valid_loader, batch_size, n_epochs, lr,
     k = 0
     for epoch in range(n_epochs):
         start_time = time.time()
-        print(f"[Epoch {epoch + 1}]")
+        print(f"[Epoch {epoch + 1}/{n_epochs}]")
         print("[INFO] Training Model.....")
         train_loss = train_epoch(model, optimizer, epoch, train_loader,
                                  device, model_type)
@@ -184,12 +175,7 @@ def train(model, train_loader, valid_loader, batch_size, n_epochs, lr,
         train_losses.append(train_loss)
         valid_losses.append(valid_loss)
 
-        """
-        print(f"Epoch {epoch + 1}: Train: avg. loss: {train_loss:.3f}")
-        print(f"Epoch {epoch + 1}: Valid: avg. loss: {valid_loss:.3f}")
-        """
-
-        print(f"[RESULT] Epoch {epoch + 1}/{n_epochs}"  
+        print(f"[RESULT] Epoch {epoch + 1}/{n_epochs}"
               f"\tTrain loss: {train_loss:.3f}\tVal loss: {valid_loss:.3f}")
 
         if step_size != -1:
@@ -206,7 +192,7 @@ def train(model, train_loader, valid_loader, batch_size, n_epochs, lr,
                                                      prime=False)
 
             else:
-                gen_seq = generate_conditional_sequence( # , phi
+                gen_seq = generate_conditional_sequence(
                     model_path,
                     "Hello world!",
                     device,
@@ -216,18 +202,8 @@ def train(model, train_loader, valid_loader, batch_size, n_epochs, lr,
                     prime=False,
                     prime_seq=None,
                     real_text=None
-                    # is_map=True,
                 )
 
-                # plt.imshow(phi, cmap="viridis", aspect="auto")
-                # plt.colorbar()
-                # plt.xlabel("time steps")
-                # plt.yticks(np.arange(phi.shape[1]), list("Hello world!  "),
-                #            rotation="horizontal")
-                # plt.margins(0.2)
-                # plt.subplots_adjust(bottom=0.15)
-                # plt.savefig(save_path + "heat_map" + str(best_epoch) + ".png")
-                # plt.close()
             # denormalize the generated offsets using train set mean and std
             gen_seq = data_denormalization(
                 Global.train_mean, Global.train_std, gen_seq)
@@ -245,7 +221,8 @@ def train(model, train_loader, valid_loader, batch_size, n_epochs, lr,
             break
         else:
             k += 1
-        print('Time taken per epoch: {:.2f}s\n'.format(time.time() - start_time))
+        total_time_taken = time.time() - start_time
+        print('Time taken per epoch: {:.2f}s\n'.format(total_time_taken))
 
 
 if __name__ == "__main__":
@@ -261,12 +238,10 @@ if __name__ == "__main__":
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    """
-    print("Arguments: {}".format(args))
-    """
     print('--ARGUMENTS--')
     for arg in vars(args):
-        print(f"{arg} = {getattr(args, arg)}")
+        print(f"[{arg}] = {getattr(args, arg)}", end=",  ")
+    print("")
     model_type = args.model_type
     batch_size = args.batch_size
     n_epochs = args.n_epochs

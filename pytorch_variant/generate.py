@@ -4,8 +4,6 @@ import torch
 import numpy as np
 import argparse
 import os
-# import matplotlib
-# import matplotlib.pyplot as plt
 from pathlib import Path
 from utils import plot_stroke
 from utils.constants import Global
@@ -26,16 +24,12 @@ def argparser():
     )
     parser.add_argument("--save_path", type=Path, default="./results/")
     parser.add_argument("--seq_len", type=int, default=400)
-    # parser.add_argument("--batch_size", type=int, default=1)
     parser.add_argument("--bias", type=float, default=10.0, help="bias")
     parser.add_argument("--char_seq", type=str,
                         default="A sample of generated handwriting")
     parser.add_argument("--text_req", action="store_true")
-    # parser.add_argument("--prime", action="store_true")
-    # parser.add_argument("--is_map", action="store_true")
     parser.add_argument("--seed", type=int, help="random seed")
     parser.add_argument("--data_path", type=str, default="./data/")
-    # parser.add_argument("--file_path", type=str, help="./app/")
     parser.add_argument("--style", type=int, help="style number [0,4]")
     parser.add_argument("--save_img", action="store_true")
     args = parser.parse_args()
@@ -68,16 +62,11 @@ def generate_unconditional_seq(model_path, seq_len, device, bias, style,
 
 def generate_conditional_sequence(model_path, char_seq, device, char_to_id,
                                   idx_to_char, bias, prime, prime_seq,
-                                  real_text, batch_size=1):  # is_map,
+                                  real_text, batch_size=1):
 
     model = HandWritingSynthesisNet(window_size=len(char_to_id))
     # load the best model
     model.load_state_dict(torch.load(model_path, map_location=device))
-
-    # Print model's state_dict
-    # print(f"Model's state_dict:")
-    # for param_tensor in model.state_dict():
-    #     print(f"{param_tensor}\t {model.state_dict()[param_tensor]}")
 
     model = model.to(device)
     model.eval()
@@ -112,19 +101,12 @@ def generate_conditional_sequence(model_path, char_seq, device, char_to_id,
                              hidden, window_vector, kappa, bias,
                              prime=prime)
 
-    # length = len(text_mask.nonzero())
     length = len(torch.nonzero(text_mask, as_tuple=False).to(text_mask.device))
     print("Input text:", "".join(idx_to_char(
         text[0].detach().cpu().numpy()))[:length])
     print("Length of input text:", text[0].shape[0])
 
-    # if is_map:
-    #     phi = torch.cat(model._phi, dim=1).cpu().numpy()
-    #     phi = phi[0].T
-    # else:
-    #     phi = []
-
-    return gen_seq  # , phi
+    return gen_seq
 
 
 if __name__ == "__main__":
@@ -148,46 +130,16 @@ if __name__ == "__main__":
         args.data_path, split="train", text_req=args.text_req
     )
 
-    if args.style is not None:  # args.prime and
-        # style = np.load(
-        #     args.file_path + "style.npy", allow_pickle=True, encoding="bytes"
-        # ).astype(np.float32)
-        # with open(args.file_path + "inpText.txt") as file:
-        #     texts = file.read().splitlines()
-        # real_text = texts[0]
+    if args.style is not None:
         styles = np.load('./styles/style_strokes.npy', allow_pickle=True)
         texts = np.load('./styles/style_sents.npy', allow_pickle=True)
         real_text = texts[args.style]
         style = styles[args.style]
-        # plot the sequence
-        # plot_stroke(style, save_name=args.save_path / "style.png")
-        # print(real_text)
         mean, std, _ = data_normalization(style)
         style = np.expand_dims(style, axis=0)
-        # style = np.array([style for i in range(args.batch_size)])
         style = torch.from_numpy(style).to(device)
-        # style = torch.from_numpy(style).unsqueeze(0).to(device)
-        # print(style.shape)
         ytext = real_text + " " + args.char_seq + "  "
-    # elif args.prime:
-    #     strokes = np.load(
-    #       args.data_path + "strokes.npy", allow_pickle=True, encoding="bytes"
-    #     )
-    #     with open(args.data_path + "sentences.txt") as file:
-    #         texts = file.read().splitlines()
-    #     idx = np.random.randint(0, len(strokes))
-    #     print("Prime style index: ", idx)
-    #     real_text = texts[idx]
-    #     style = strokes[idx]
-    #     # plot the sequence
-    #     plot_stroke(style, save_name=args.save_path /
-    #                 ("style_" + str(idx) + ".png"))
-    #     print(real_text)
-    #     mean, std, _ = data_normalization(style)
-    #     style = np.array([style for i in range(args.batch_size)])
-    #     style = torch.from_numpy(style).to(device)
-    #     print(style.shape)
-    #     ytext = real_text + " " + args.char_seq + "  "
+
     else:
         idx = -1
         real_text = ""
@@ -205,22 +157,7 @@ if __name__ == "__main__":
                                                 train_dataset.idx_to_char,
                                                 args.bias, prime,
                                                 style, real_text)
-        # if args.is_map:
-        #     plt.imshow(phi, cmap="viridis", aspect="auto")
-        #     plt.colorbar()
-        #     plt.xlabel("time steps")
-        #     plt.yticks(np.arange(phi.shape[0]), list(
-        #         ytext), rotation="horizontal")
-        #     plt.margins(0.2)
-        #     plt.subplots_adjust(bottom=0.15)
-        #     plt.savefig("heat_map.png")
-        #     plt.close()
 
-    # denormalize the generated offsets using train set mean and std
-    # if args.prime:
-    #     print("data denormalization...")
-    #     gen_seq = data_denormalization(mean, std, gen_seq)
-    # else:
     gen_seq = data_denormalization(
         Global.train_mean, Global.train_std, gen_seq)
     gen_seq = np.squeeze(gen_seq)
@@ -239,19 +176,3 @@ if __name__ == "__main__":
               codecs.open(json_file_path, 'w', encoding='utf-8'),
               separators=(',', ':'), sort_keys=True, indent=4)
     print(f"Sequence saved to json: {json_file_path}")
-
-    # for i in range(args.batch_size):
-    #     if args.save_img:
-    #         # plot the sequence
-    #         img_path = os.path.join(str(args.save_path),
-    #                                 "gen_img_" + str(i) + ".png")
-    #         plot_stroke(gen_seq[i], save_name=img_path)
-    #         print(f"Image {i} saved as: {img_path}")
-
-    #     seq_list = gen_seq[i].tolist()
-    #     json_file_path = os.path.join(str(args.save_path),
-    #                                   "generated_seq_" + str(i) + ".json")
-    #     json.dump(seq_list,
-    #               codecs.open(json_file_path, 'w', encoding='utf-8'),
-    #               separators=(',', ':'), sort_keys=True, indent=4)
-    #     print(f"Sequence {i} saved to json: {json_file_path}")
