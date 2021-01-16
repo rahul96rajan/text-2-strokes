@@ -6,10 +6,12 @@ in the following order
     └──data
         |
         └──original-xml-part
-            | a01
-            | a02
-            | a03
-            | ...
+            |
+            └──original
+                | a01
+                | a02
+                | a03
+                | ...
 """
 
 import os
