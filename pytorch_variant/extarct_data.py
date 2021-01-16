@@ -59,10 +59,12 @@ def change_coord_to_offsets(stroke, norm_factor=20):
 
 def save_data(strokes, sents, path='./data'):
     strokes = np.asarray(strokes)
-    np.save(path + "/strokes.py", strokes)
+    np.save(path + "/strokes", strokes)
     with open(path + '/sentences.txt', 'w') as fl:
         for sent in sents:
             fl.write(sent)
+    print(f'[SAVED] saved strokes at {path + "/strokes.npy"}')
+    print(f'[SAVED] saved sentences at {path + "/sentences.txt"}')
 
 
 def extract_data(path='./data/original-xml-part/'):
@@ -125,7 +127,7 @@ def extract_data(path='./data/original-xml-part/'):
 
         strokes_all.extend(textlines_seq)
         sentences_all.extend(textslines)
-        print(f'[{file_no:4d}] File: ./{file} -- '
+        print(f'[{file_no:4d}] File: {file} -- '
               f'TextLines: {len(textlines_seq)}')
 
     assert len(sentences_all) == len(strokes_all)
