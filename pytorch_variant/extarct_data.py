@@ -57,7 +57,21 @@ def change_coord_to_offsets(stroke, norm_factor=20):
     return np.vstack(([0, 0, 0], stroke_offed)).astype('float32')
 
 
+def save_data(strokes, sents, path='./data'):
+    strokes = np.asarray(strokes)
+    np.save(path + "/strokes.py", strokes)
+    with open(path + '/sentences.txt', 'w') as fl:
+        for sent in sents:
+            fl.write(sent)
+
+
 def extract_data(path='./data/original-xml-part/'):
+    """
+        - Reads text lines and corresponding x,y coordinates from the xml files
+        - Adds eos character to denote pens lift from whiteboard
+        - Calculates offsets from coordinates
+        - Returns sentences and corresponding stroke arrray (eos, x, y)
+    """
     files_paths = glob.glob(path + '**/*.xml', recursive=True)
     file_no = 0
     sentences_all = []
@@ -121,3 +135,4 @@ def extract_data(path='./data/original-xml-part/'):
 
 if __name__ == "__main__":
     strokes, sents = extract_data()
+    save_data(strokes, sents)
