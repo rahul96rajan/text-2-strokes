@@ -62,7 +62,7 @@ def save_data(strokes, sents, path='./data'):
     np.save(path + "/strokes", strokes)
     with open(path + '/sentences.txt', 'w') as fl:
         for sent in sents:
-            fl.write(sent)
+            fl.write(sent + '\n')
     print(f'[SAVED] saved strokes at {path + "/strokes.npy"}')
     print(f'[SAVED] saved sentences at {path + "/sentences.txt"}')
 
