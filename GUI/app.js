@@ -42,23 +42,6 @@ app.on("window-all-closed", function() {
 	if (process.platform !== "darwin") app.quit();
 });
 
-// app.on("activate", function() {
-//   if (mainWindow === null) createWindow();
-// });
-
-
-
-// Register an event listener. When ipcRenderer sends mouse click co-ordinates, show menu at that point.
-// ipcMain.on(`display-app-menu`, function(e, args) {
-//   if (mainWindow) {
-//     menu.popup({
-//       window: mainWindow,
-//       x: args.x,
-//       y: args.y
-//     });
-//   }
-// });
-
 
 ipcMain.on('buttonClicked', function(event) {
   // alert('hi');

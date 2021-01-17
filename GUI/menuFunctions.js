@@ -1,4 +1,4 @@
-const { remote, ipcRenderer } = require("electron");
+ const { remote, ipcRenderer } = require("electron");
 
 function getCurrentWindow() {
   return remote.getCurrentWindow();
