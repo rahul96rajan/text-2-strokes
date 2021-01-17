@@ -1,5 +1,5 @@
 {
-  "name": "python_project",
+  "name": "Text-to-Stroke",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
@@ -8,8 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "Lokesh Bisht and, Rhaul Rajan",
-  "license": "ISC",
+  "author": "Lokesh Bisht, Rahul Rajan",
+  "license": "MIT",
   "devDependencies": {
     "electron": "^11.1.1"
   }

@@ -1,0 +1,42 @@
+#appTitle {
+    text-align: center;
+    font-family: "Fantasy", copperplate;
+    font-size: 55px;
+}
+
+#inputBox {
+    margin: 20px;
+    width: 60%;
+    height: 30px;
+    border-width: 0px 0px 2px 0px;
+    border-color: rgb(160, 0, 0); 
+    outline: none;
+}
+
+#styleDropdown, #inputBox {
+    font-size: 25px;
+}
+
+#container > input::-webkit-input-placeholder {
+    font-size: 25px;
+    color: rgb(240, 87, 87);
+    /* line-height: 3; */
+}
+
+#container > button {
+    margin-left: 20px;
+    border-radius: 15px;
+    background-color: rgba(0, 0, 136, 0.938);
+    color: white;
+    font-size: 20px;
+    padding: 8px;
+    border: none;
+}
+
+#container > button:hover {
+    cursor: pointer;
+}
+
+#showImage {
+    margin-top: 40px;
+}
