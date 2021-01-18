@@ -5,6 +5,12 @@ var submitBtn = document.getElementById('submit');
 
 submitBtn.addEventListener('click', function(){
 	// let initCommand = "cd ../../../..";
+	var src = document.getElementById("showImage");
+	src.innerHTML = "";
+	var loader = document.createElement("div");
+	loader.setAttribute('class', 'loader')
+	src.appendChild(loader).style.cssText = 'margin-left: auto; margin-right: auto; display: block;';
+
 	let command = ("cd .. && python3 generate.py --char_seq '"
 					+ document.getElementById('inputBox').value + "' --style " +
 					+ document.getElementById('fontStyle').value +
@@ -31,7 +37,7 @@ submitBtn.addEventListener('click', function(){
 	(function wait() {
 		if ( imagePath !== "" ) {
 			console.log("Image Path: " + imagePath);
-			var src = document.getElementById("showImage");
+			src = document.getElementById("showImage");
 			src.innerHTML="";
 
 			// to display the newly generated image
