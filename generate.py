@@ -6,7 +6,7 @@ import numpy as np
 import argparse
 import os
 from pathlib import Path
-from utils import plot_stroke
+from utils import plot_stroke, plot_stroke_gif
 from utils.constants import Global
 from utils.dataset import HandwritingDataset
 from utils.data_utils import data_denormalization, data_normalization
@@ -32,7 +32,9 @@ def argparser():
     parser.add_argument("--seed", type=int, help="random seed")
     parser.add_argument("--data_path", type=str, default="./data/")
     parser.add_argument("--style", type=int, help="style number [0,4]")
-    parser.add_argument("--save_img", action="store_true")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--save_img", action="store_true")
+    group.add_argument("--save_gif", action="store_true")
     args = parser.parse_args()
 
     return args
@@ -169,6 +171,12 @@ if __name__ == "__main__":
                                 "gen_img"+str(time.time())+".png")
         plot_stroke(gen_seq, save_name=img_path)
         print(f"Image saved as: {img_path}")
+
+    if args.save_gif:
+        gif_path = os.path.join(str(args.save_path),
+                                "gen_img"+str(time.time())+".gif")
+        plot_stroke_gif(gen_seq, save_name=gif_path)
+        print(f"GIF saved as: {gif_path}")
 
     # Export generated sequence as json
     seq_list = gen_seq.tolist()
