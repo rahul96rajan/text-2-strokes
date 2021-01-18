@@ -4,3 +4,6 @@ __pycache__/
 *.ipynb
 supertemp.py
 node_modules
+.DS_store
+.**/gen_img*.png
+.**/generated_seq.json

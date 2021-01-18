@@ -5,7 +5,10 @@ var submitBtn = document.getElementById('submit');
 
 submitBtn.addEventListener('click', function(){
 	// let initCommand = "cd ../../../..";
-	let command = "cd .. && python3 generate.py --char_seq '"+ document.getElementById('inputBox').value + "' --save_img";
+	let command = ("cd .. && python3 generate.py --char_seq '"
+					+ document.getElementById('inputBox').value + "' --style " +
+					+ document.getElementById('fontStyle').value +
+					" --save_img");
 	let regexString = /results[/]gen_img.*.png/;
 	let imagePath = "";
 	
@@ -21,22 +24,20 @@ submitBtn.addEventListener('click', function(){
 			console.log(data);
 			return;
 		}
-		console.log(data);
 		imagePath = data.match(regexString)[0];
-		console.log(imagePath);
 	});
 
 
 	(function wait() {
 		if ( imagePath !== "" ) {
-			console.log(imagePath);
+			console.log("Image Path: " + imagePath);
 			var src = document.getElementById("showImage");
 			src.innerHTML="";
 
 			// to display the newly generated image
 			var img = document.createElement("img");
 			
-			img.src = "../"+imagePath; //http://www.google.com/intl/en_com/images/logo_plain.png";
+			img.src = "../"+imagePath;
 			src.appendChild(img).style.cssText = 'width: 95%; margin-left: auto; margin-right: auto; display: block;';
 			console.log("added new image");
 		} else {
