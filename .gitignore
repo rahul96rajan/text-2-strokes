@@ -5,5 +5,4 @@ __pycache__/
 supertemp.py
 node_modules
 .DS_store
-.**/gen_img*.png
-.**/generated_seq.json
+results/*
