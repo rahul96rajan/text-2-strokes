@@ -9,8 +9,8 @@ const isMac = process.platform === "darwin";
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 900,
-    height: 600,
+    width: 1000,
+    height: 500,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       // (NOT RECOMMENDED)
