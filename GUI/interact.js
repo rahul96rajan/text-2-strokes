@@ -47,7 +47,7 @@ submitBtn.addEventListener('click', function(){
 			src.appendChild(img).style.cssText = 'width: 100%; margin-left: auto; margin-right: auto; display: block;';
 			console.log("added new image");
 		} else {
-			setTimeout( wait, 500 );
+			setTimeout( wait, 50 );
 		}
 	})();
 });
