@@ -1,27 +1,17 @@
 var inputField = document.querySelector('#inputBox')
 var submitBtn = document.querySelector('#submit')
 
-
-function changeButtonColor(textEnteredLength, disabled) {
-    if (textEnteredLength >= 4 && textEnteredLength < 50) disabled = false;
+function updateBtnStatus(str) {
+    let textEnteredLength = str.length;
+    console.log(textEnteredLength)
+    let disabled = true
+    if (textEnteredLength >= 5 && textEnteredLength <= 50) disabled = false;
+    
     if (disabled) {
         submitBtn.setAttribute('disabled', 'disabled')
-        submitBtn.style.cssText = 'color:red; background-color:green;';
+        submitBtn.style.cssText = 'color:rgba(255, 255, 255, 0.412); background-color:rgba(0, 0, 136, 0.412);';
     } else {
         submitBtn.removeAttribute('disabled');
-        submitBtn.style.cssText = 'color:white; background-color:blue;';
+        submitBtn.style.cssText = 'color:white; background-color:rgba(0, 0, 136, 0.938);';
     }
 }
-
-
-inputField.addEventListener('keydown', function(e) {
-    var disabled = true;
-
-    const key = event.key;
-    let textEnteredLength = inputField.value.length;
-
-    if (key === "Backspace" || key === "Delete") {textEnteredLength = inputField.value.length; changeButtonColor(textEnteredLength, disabled);}
-
-    console.log(inputField.value.length)
-    if (textEnteredLength >= 4 && textEnteredLength < 50) {disabled = false; changeButtonColor(textEnteredLength, disabled);};
-})

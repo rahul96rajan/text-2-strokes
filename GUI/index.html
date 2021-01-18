@@ -12,7 +12,7 @@
         <div id="global-container">
             <div id="container">
                 <h1 id="appTitle">Text to Stroke</h1>
-                <input type="text" placeholder="Enter text (between 5 and 50 characters)" name="inputString" id="inputBox"></input>
+                <input type="text" placeholder="Enter text (between 5 and 50 characters)" name="inputString" id="inputBox" onkeyup="updateBtnStatus(this.value)"></input>
                 <label for="Styles" id="styleDropdown">Choose a style:</label>
                 <select name="Font Style" id="fontStyle">
                     <option value="0">Font 1</option>
