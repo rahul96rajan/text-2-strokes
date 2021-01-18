@@ -1,6 +1,7 @@
 import json
 import codecs
 import torch
+import time
 import numpy as np
 import argparse
 import os
@@ -165,7 +166,7 @@ if __name__ == "__main__":
     # plot the sequence
     if args.save_img:
         img_path = os.path.join(str(args.save_path),
-                                "gen_img.png")
+                                "gen_img"+str(time.time())+".png")
         plot_stroke(gen_seq, save_name=img_path)
         print(f"Image saved as: {img_path}")
 
