@@ -44,7 +44,7 @@ submitBtn.addEventListener('click', function(){
 			var img = document.createElement("img");
 			
 			img.src = "../"+imagePath;
-			src.appendChild(img).style.cssText = 'width: 95%; margin-left: auto; margin-right: auto; display: block;';
+			src.appendChild(img).style.cssText = 'width: 100%; margin-left: auto; margin-right: auto; display: block;';
 			console.log("added new image");
 		} else {
 			setTimeout( wait, 500 );
