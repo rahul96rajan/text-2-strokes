@@ -15,7 +15,7 @@ submitBtn.addEventListener('click', function(){
 					+ document.getElementById('inputBox').value + "' --style " +
 					+ document.getElementById('fontStyle').value +
 					" --save_img");
-	let regexString = /results[/]gen_img.*.png/;
+	let regexString = /results[/]gen_img.*.[gif|png]/;
 	let imagePath = "";
 	
 	const { exec } = require("child_process");
