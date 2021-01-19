@@ -26,7 +26,7 @@ After cloning repo, install python packages using ```pip install -r requirements
 And similarly install node-modules using ```npm install```
 
 ### 1. Download dataset
-Download [IAM On-Line Handwriting Database]((http://www.fki.inf.unibe.ch/databases/iam-on-line-handwriting-database). Place the extracted folder `original-xml-part` under `text-2-strokes/data/`.
+Download [IAM On-Line Handwriting Database](http://www.fki.inf.unibe.ch/databases/iam-on-line-handwriting-database). Place the extracted folder `original-xml-part` under `text-2-strokes/data/`.
 
 ### 2. Preprocess dataset
 ```
