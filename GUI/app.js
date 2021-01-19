@@ -13,11 +13,7 @@ function createWindow() {
     height: 500,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
-      // (NOT RECOMMENDED)
-      // If true, we can skip attaching functions from ./menu-functions.js to window object in preload.js.
-      // And, instead, we can use electron APIs directly in renderer.js
-      // From Electron v5, nodeIntegration is set to false by default. And it is recommended to use preload.js to get access to only required Node.js apis.
-      nodeIntegration: true
+      nodeIntegration: true,
     },
     frame: isWindows ? false : true //Remove frame to hide default menu
   });
@@ -41,9 +37,3 @@ app.on('ready', function(){
 app.on("window-all-closed", function() {
 	if (process.platform !== "darwin") app.quit();
 });
-
-
-ipcMain.on('buttonClicked', function(event) {
-  // alert('hi');
-  dialog.showErrorBox('error msg', 'demo of an error msg');
-}) 
