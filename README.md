@@ -1,9 +1,9 @@
 # Text-2-Strokes (WIP)
 
-An attempt to implement the handwriting synthesis basing the paper '[Generating Sequences with Recurrent Neural Networks](https://arxiv.org/abs/1308.0850)' by Alex Graves. GUI is built with electron.js.
+An attempt to implement handwriting synthesis basing the paper '[Generating Sequences with Recurrent Neural Networks](https://arxiv.org/abs/1308.0850)' by Alex Graves. GUI is built with electron.js.
 
 ## Demo
-```// TODO: gif here```
+![GUI_workflow](https://raw.githubusercontent.com/rahul96rajan/text-2-strokes/main/results/samples/gui_example.gif)
 
 ## Dependencies
 Python libraries required:
@@ -82,4 +82,12 @@ Similarly a number of arguments can be set for generation also, if you wish to e
 ```npm start```
 
 ### Examples
-```TODO: add images here```
+```
+python generate.py --char_seq "A sample of generated text" --save_gif --style 1
+```
+![sample1](https://raw.githubusercontent.com/rahul96rajan/text-2-strokes/main/results/samples/generated_samples1.gif)
+</br>
+```
+python generate.py --char_seq "I am Rahul" --save_gif --style 4
+```
+![sample2](https://raw.githubusercontent.com/rahul96rajan/text-2-strokes/main/results/samples/generated_samples2.gif)
