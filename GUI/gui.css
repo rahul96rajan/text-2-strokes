@@ -13,8 +13,12 @@
     outline: none;
 }
 
-#styleDropdown, #inputBox {
-    font-size: 25px;
+#styleDropdown, #inputBox, #animDropdown{
+    font-size: 20px;
+}
+
+ #animFlag, #fontStyle {
+    margin-right: 10px;
 }
 
 #container > input::-webkit-input-placeholder {
@@ -24,7 +28,6 @@
 }
 
 #container > button {
-    margin-left: 20px;
     border-radius: 15px;
     background-color: rgba(0, 0, 136, 0.938);
     color: white;

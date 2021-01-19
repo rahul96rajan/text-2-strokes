@@ -13,13 +13,17 @@
             <div id="container">
                 <h1 id="appTitle">Text to Stroke</h1>
                 <input type="text" placeholder="Enter text (between 5 and 50 characters)" name="inputString" id="inputBox" onkeyup="updateBtnStatus(this.value)"></input>
-                <label for="Styles" id="styleDropdown">Choose a style:</label>
+                <label for="Styles" id="styleDropdown">Style:</label>
                 <select name="Font Style" id="fontStyle">
                     <option value="0">Font 1</option>
                     <option value="1">Font 2</option>
                     <option value="2">Font 3</option>
                     <option value="3">Font 4</option>
                     <option value="4">Font 5</option>
+                </select><label for="Animations" id="animDropdown">Animate:</label>
+                <select name="AnimFlag" id="animFlag">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
                 </select>
                 <button type="submit" id="submit">Submit</button>
                 <!-- <div class="loader"></div> -->
