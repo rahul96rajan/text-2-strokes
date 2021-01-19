@@ -11,10 +11,13 @@ submitBtn.addEventListener('click', function(){
 	loader.setAttribute('class', 'loader')
 	src.appendChild(loader).style.cssText = 'margin-left: auto; margin-right: auto; display: block;';
 
+	let imgType = " --save_img"
+	if(document.getElementById('animFlag').value==='1') imgType = " --save_gif"
+
 	let command = ("cd .. && python3 generate.py --char_seq '"
 					+ document.getElementById('inputBox').value + "' --style " +
 					+ document.getElementById('fontStyle').value +
-					" --save_img");
+					imgType);
 	let regexString = /results[/]gen_img.*.[gif|png]/;
 	let imagePath = "";
 	
