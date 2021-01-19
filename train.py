@@ -21,19 +21,32 @@ def argparser():
 
     parser = argparse.ArgumentParser(
         description="PyTorch Handwriting Synthesis Model")
-    parser.add_argument("--hidden_size", type=int, default=400)
-    parser.add_argument("--n_layers", type=int, default=3)
-    parser.add_argument("--batch_size", type=int, default=32)
-    parser.add_argument("--step_size", type=int, default=100)
-    parser.add_argument("--n_epochs", type=int, default=100)
-    parser.add_argument("--lr", type=float, default=0.001)
-    parser.add_argument("--patience", type=int, default=15)
-    parser.add_argument("--model_type", type=str, default="prediction")
-    parser.add_argument("--data_path", type=str, default="./data/")
-    parser.add_argument("--save_path", type=str, default="./logs/")
-    parser.add_argument("--text_req", action="store_true")
-    parser.add_argument("--data_aug", action="store_true")
-    parser.add_argument("--seed", type=int, default=212, help="random seed")
+    parser.add_argument("--hidden_size", type=int, default=400, metavar="",
+                        help="#hidden states for LSTM layer")
+    parser.add_argument("--n_layers", type=int, default=3, metavar="",
+                        help="#LSTM layer")
+    parser.add_argument("--batch_size", type=int, default=32, metavar="",
+                        help="size of training batch")
+    parser.add_argument("--step_size", type=int, default=100, metavar="",
+                        help="step size for learning rate decay")
+    parser.add_argument("--n_epochs", type=int, default=100, metavar="",
+                        help="#Training epochs")
+    parser.add_argument("--lr", type=float, default=0.001, metavar="",
+                        help="learning rate")
+    parser.add_argument("--patience", type=int, default=15, metavar="",
+                        help="patience for early stopping")
+    parser.add_argument("--model_type", type=str, default="prediction",
+                        metavar="", help="train model type")
+    parser.add_argument("--data_path", type=str, default="./data/", metavar="",
+                        help="path to processed training data")
+    parser.add_argument("--save_path", type=str, default="./logs/", metavar="",
+                        help="path where training weights are stored")
+    parser.add_argument("--text_req", action="store_true",
+                        help="flag indicating to fetch text data also")
+    parser.add_argument("--data_aug", action="store_true",
+                        help="flag to whether data augmentation required")
+    parser.add_argument("--seed", type=int, default=212, metavar="",
+                        help="random seed")
     args = parser.parse_args()
 
     return args

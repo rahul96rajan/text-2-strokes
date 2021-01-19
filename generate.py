@@ -17,24 +17,32 @@ def argparser():
 
     parser = argparse.ArgumentParser(
         description="PyTorch Handwriting Synthesis Model")
-    parser.add_argument("--model", type=str, default="synthesis")
-    parser.add_argument(
-        "--model_path",
-        type=Path,
-        default="./pretrained/model_synthesis.pt"
-    )
-    parser.add_argument("--save_path", type=Path, default="./results/")
-    parser.add_argument("--seq_len", type=int, default=400)
-    parser.add_argument("--bias", type=float, default=10.0, help="bias")
+    parser.add_argument("--model", type=str, default="synthesis", metavar="",
+                        help="type of model")
+    parser.add_argument("--model_path", type=Path,
+                        default="./pretrained/model_synthesis.pt", metavar="",
+                        help="path to trained weights")
+    parser.add_argument("--save_path", type=Path, default="./results/",
+                        metavar="", help="output path")
+    parser.add_argument("--seq_len", type=int, default=400, metavar="",
+                        help="length of input sequence")
+    parser.add_argument("--bias", type=float, default=10.0, metavar="",
+                        help="bias term")
     parser.add_argument("--char_seq", type=str,
-                        default="A sample of generated handwriting")
-    parser.add_argument("--text_req", action="store_true")
-    parser.add_argument("--seed", type=int, help="random seed")
-    parser.add_argument("--data_path", type=str, default="./data/")
-    parser.add_argument("--style", type=int, help="style number [0,4]")
+                        default="A sample of generated handwriting",
+                        metavar="", help="input text")
+    parser.add_argument("--text_req", action="store_true",
+                        help="flag indicating to fetch text data also")
+    parser.add_argument("--seed", type=int, metavar="", help="random seed")
+    parser.add_argument("--data_path", type=str, default="./data/", metavar="",
+                        help="path to processed training data")
+    parser.add_argument("--style", type=int, metavar="",
+                        help="style number [0,4]")
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--save_img", action="store_true")
-    group.add_argument("--save_gif", action="store_true")
+    group.add_argument("--save_img", action="store_true",
+                       help="save output as .png")
+    group.add_argument("--save_gif", action="store_true",
+                       help="save output as .gif")
     args = parser.parse_args()
 
     return args
