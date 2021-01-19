@@ -14,7 +14,7 @@ submitBtn.addEventListener('click', function(){
 	let imgType = " --save_img"
 	if(document.getElementById('animFlag').value==='1') imgType = " --save_gif"
 
-	let command = ("cd .. && python3 generate.py --char_seq '"
+	let command = ("python3 generate.py --char_seq '"
 					+ document.getElementById('inputBox').value + "' --style " +
 					+ document.getElementById('fontStyle').value +
 					imgType);
