@@ -1,4 +1,4 @@
-# Text-2-Strokes (WIP)
+# Text-2-Strokes
 
 An attempt to implement handwriting synthesis basing the paper '[Generating Sequences with Recurrent Neural Networks](https://arxiv.org/abs/1308.0850)' by Alex Graves. GUI is built with electron.js.
 
