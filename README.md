@@ -78,7 +78,7 @@ Similarly a number of arguments can be set for generation also, if you wish to e
   --save_gif     save output as .gif
 ```
 
-#### To run GUI execute:
+#### To run GUI, execute:
 ```npm start```
 
 ### Examples
@@ -91,3 +91,16 @@ python generate.py --char_seq "A sample of generated text" --save_gif --style 1
 python generate.py --char_seq "I am Rahul" --save_gif --style 4
 ```
 ![sample2](https://raw.githubusercontent.com/rahul96rajan/text-2-strokes/main/results/samples/generated_samples2.gif)
+
+## References
+[1] [Alex Graves, Generating Sequences With Recurrent Neural Networks, 2014](https://arxiv.org/abs/1308.0850)
+
+[2] [IAM On-Line Handwriting Database, Universität Bern, 2005](https://fki.tic.heia-fr.ch/databases/iam-on-line-handwriting-database)
+
+[3] [Swechha Choudhary's implemetation of the paper](https://github.com/swechhachoudhary/Handwriting-synthesis)
+
+[4] [Grzegorz Opoka's implementation of the paper](https://github.com/Grzego/handwriting-generation)
+
+
+
+Any feedback is much appreciated :smiley:
